@@ -19,12 +19,13 @@
     </td>
     <td class="lightLine centerLine">{{ unit.devices }}</td>
     <td class="lightLine">
-      <div class="simBox">
         {{ unit.sim }}
-        <img src="../assets/dots-horizontal.svg" alt="icon" width="14" height="14" />
-
-      </div>
+       
     </td>
+    <td>
+        <img src="../../assets/dots-horizontal.svg" alt="icon" width="14" height="14" />
+
+       </td>
 
   </tr>
 </template>
@@ -72,16 +73,16 @@ a {
 .state.on {
   color: #10B981;
   background-color: #dbf5ec;
-  padding: 10px;
-  border-radius: 50%;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-weight: bold;
 }
 
 .state.off {
   color: #50606e;
   background-color: #e4ebf2;
-  padding: 8px;
-  border-radius: 50%;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-weight: bold;
 }
 
