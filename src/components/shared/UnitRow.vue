@@ -19,27 +19,30 @@
     </td>
     <td class="lightLine centerLine">{{ unit.devices }}</td>
     <td class="lightLine">
-        {{ unit.sim }}
-       
+      {{ unit.sim }}
+
     </td>
     <td>
-        <img src="../../assets/dots-horizontal.svg" alt="icon" width="14" height="14" />
-
-       </td>
+      <V />
+    </td>
 
   </tr>
 </template>
 
 <script>
+import V from './OptionsColoumn.vue'
+
 export default {
   name: "UnitRow",
   props: {
-  unit: {
-    type: Object,
-    required: true
+    unit: {
+      type: Object,
+      required: true
+    }
+  },
+  components: {
+    V
   }
-}
-
 };
 </script>
 
@@ -89,5 +92,10 @@ a {
 .simBox {
   display: flex;
   gap: 15px
+}
+
+td {
+  vertical-align: middle;
+  overflow: visible;
 }
 </style>

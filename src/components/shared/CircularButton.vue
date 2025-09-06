@@ -1,6 +1,6 @@
 <!-- Button.vue -->
 <template>
-    <button class="btn" @click="$emit('click')">
+    <button class="btn">
         <img v-if="icon" :src="icon" alt="" class="icon" />
     </button>
 </template>

@@ -6,20 +6,21 @@ import TrashIcon from '../../assets/trash-01.svg'
 import SelectBtn from './Select.vue'
 import Search from './SearchBox.vue'
 import PlusIcon from '../../assets/plus.svg'
+import Group from './Group.vue'
+import Export from './Export.vue'
 </script>
-
 
 <template>
     <div class="pageHeader">
         <div class="leftSection">
+
             <Search />
-            <SelectBtn option1="Group" customSelectWidth="90px" selectWidth="90%" :iconRightSpace="20" />
+            <Group />
             <Btn label="Sort" :iconRight="AddIcon" @click="addUnit" />
 
             <SelectBtn option1="All Units" />
 
-            <Btn label="Export" @click="exportUnits"
-                :showArrow="false" />
+            <Export />
             <Btn :iconRight="RefreshIcon" @click="addUnit" />
             <Btn label="Deleted Items" :iconLeft="TrashIcon" @click="addUnit" />
         </div>
