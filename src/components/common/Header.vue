@@ -17,7 +17,7 @@ import User from '../shared/User.vue'
             <User />
         </div>
     </div>
-
+<button :class="active ? 'text-red' : 'text-green'"></button>
 </template>
 
 <style>
