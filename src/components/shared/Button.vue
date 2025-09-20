@@ -36,6 +36,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-height: 50px;
 }
 
 .icon {

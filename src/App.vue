@@ -5,7 +5,7 @@ import MainHeader from './components/common/Header.vue'
 </script>
 
 <template>
-  <div class="container">
+  <div class="containerApp">
     <SideBar />
     <div class="RightContent">
       <MainHeader />
@@ -15,13 +15,14 @@ import MainHeader from './components/common/Header.vue'
 </template>
 
 <style>
-.container {
+.containerApp {
   display: flex;
   align-items: self-start;
 }
 
 .RightContent{
+  background-color: #f0f5fa !important;
   width: 100%;
-  padding: 0 20px;
+  padding: 10px 20px;
 }
 </style>

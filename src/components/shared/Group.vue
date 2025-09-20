@@ -1,25 +1,23 @@
 <template>
-    <div class="multi-select">
-        <div class="select-box" @click="toggleDropdown">
-            <div class="selected-tags">
-                <span v-if="selectedOptions.length === 0" class="placeholder">
+    <div class="ms-multi-select">
+        <div class="ms-select-box" @click="toggleDropdown">
+            <div class="ms-selected-tags">
+                <span v-if="selectedOptions.length === 0" class="ms-placeholder">
                     Group
                 </span>
 
-                <span v-else v-for="(option, index) in selectedOptions" :key="index" class="tag">
+                <span v-else v-for="(option, index) in selectedOptions" :key="index" class="ms-tag">
                     {{ option }}
-                    <span class="remove-tag" @click.stop="removeOption(option)">
-                        <img src="../../assets//X.svg" alt="icon" width="14" height="14" />
-
-
+                    <span class="ms-remove-tag" @click.stop="removeOption(option)">
+                        <img src="../../assets/X.svg" alt="icon" width="14" height="14" />
                     </span>
                 </span>
             </div>
-            <img src="../../assets/arrow.svg" alt="arrow" class="arrow" />
+            <img src="../../assets/arrow.svg" alt="arrow" class="ms-arrow" />
         </div>
 
-        <div v-if="isOpen" class="options">
-            <label v-for="option in options" :key="option" class="option">
+        <div v-if="isOpen" class="ms-options">
+            <label v-for="option in options" :key="option" class="ms-option">
                 <input type="checkbox" :value="option" v-model="selectedOptions" />
                 {{ option }}
             </label>
@@ -54,19 +52,18 @@ export default {
 </script>
 
 <style scoped>
-.multi-select {
+.ms-multi-select {
     position: relative;
     display: inline-block;
     min-width: 90px;
-
 }
 
-.select-box {
+.ms-select-box {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 5px;
-    min-height: 32px;
+    min-height: 50px !important;
     border: 1px solid #d7dee4;
     border-radius: 5px;
     padding: 5px 30px 5px 20px;
@@ -74,9 +71,12 @@ export default {
     cursor: pointer;
     width: auto;
     max-width: 100%;
+
+
+    
 }
 
-.arrow {
+.ms-arrow {
     position: absolute;
     right: 12px;
     width: 16px;
@@ -84,16 +84,15 @@ export default {
     top: 45%;
     transform: translateY(-50%);
     pointer-events: none;
-
 }
 
-.selected-tags {
+.ms-selected-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
 }
 
-.tag {
+.ms-tag {
     background-color: #0568A0;
     color: #ffffff;
     border-radius: 3px;
@@ -103,16 +102,14 @@ export default {
     align-items: center;
 }
 
-.remove-tag {
+.ms-remove-tag {
     margin-left: 4px;
     margin-top: 5px;
     cursor: pointer;
     font-weight: bold;
-
-
 }
 
-.options {
+.ms-options {
     position: absolute;
     top: 100%;
     left: 0;
@@ -126,7 +123,7 @@ export default {
     padding: 10px;
 }
 
-.option {
+.ms-option {
     display: flex;
     align-items: center;
     padding: 10px 0;
@@ -134,17 +131,10 @@ export default {
     border-bottom: 1px solid #E1E9F0;
 }
 
-.option input[type="checkbox"] {
+.ms-option input[type="checkbox"] {
     margin-right: 8px;
     margin-left: 0;
     transform: translateY(1px);
-}
-
-.option:last-child {
-    border-bottom: none;
-}
-
-.option input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     width: 16px;
@@ -156,7 +146,11 @@ export default {
     cursor: pointer;
 }
 
-.option input[type="checkbox"]:checked {
+.ms-option:last-child {
+    border-bottom: none;
+}
+
+.ms-option input[type="checkbox"]:checked {
     background-color: #10B981;
     border-color: #10B981;
     background-image: url('../../assets/check.svg');
@@ -165,7 +159,7 @@ export default {
     background-position: center;
 }
 
-.option input[type="checkbox"]:checked::before {
+.ms-option input[type="checkbox"]:checked::before {
     color: #ffffff;
     font-size: 14px;
     position: absolute;
@@ -173,7 +167,7 @@ export default {
     top: -1px;
 }
 
-.placeholder {
+.ms-placeholder {
     color: #50606E;
 }
 </style>

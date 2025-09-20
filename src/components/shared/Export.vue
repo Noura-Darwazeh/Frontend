@@ -1,14 +1,14 @@
 <template>
-    <div class="multi-select">
-        <div class="select-box" @click="toggleDropdown">
-            <span class="placeholder">
+    <div class="sh-multi-select">
+        <div class="sh-select-box" @click="toggleDropdown">
+            <span class="sh-placeholder">
                 Export
             </span>
         </div>
 
-        <div v-if="isOpen" class="options">
-            <label v-for="(option, index) in options" :key="option" class="option">
-                <img :src="optionIcons[index]" class="option-icon" />
+        <div v-if="isOpen" class="sh-options">
+            <label v-for="(option, index) in options" :key="index" class="sh-option">
+                <img :src="optionIcons[index]" class="sh-option-icon" />
                 {{ option }}
             </label>
         </div>
@@ -19,17 +19,14 @@
 import pdfIcon from '../../assets/pdf.svg';
 import excelIcon from '../../assets/excel.svg';
 import csvIcon from '../../assets/csv.svg';
+
 export default {
-    name: "MultiSelect",
+    name: "ShMultiSelect",
     data() {
         return {
             isOpen: false,
             options: ["Export as PDF", "Export as Excel", "Export as CSV"],
-            optionIcons: [
-                pdfIcon,
-                excelIcon,
-                csvIcon
-            ],
+            optionIcons: [pdfIcon, excelIcon, csvIcon],
         };
     },
     methods: {
@@ -41,18 +38,18 @@ export default {
 </script>
 
 <style scoped>
-.multi-select {
+.sh-multi-select {
     position: relative;
     display: inline-block;
     min-width: 90px;
 }
 
-.select-box {
+.sh-select-box {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 5px;
-    min-height: 32px;
+    min-height: 50px;
     border: 1px solid #d7dee4;
     border-radius: 5px;
     padding: 5px 30px 5px 20px;
@@ -62,18 +59,7 @@ export default {
     max-width: 100%;
 }
 
-.arrow {
-    position: absolute;
-    right: 12px;
-    width: 16px;
-    height: 16px;
-    top: 45%;
-    transform: translateY(-50%);
-    pointer-events: none;
-
-}
-
-.options {
+.sh-options {
     position: absolute;
     top: 100%;
     right: 0;
@@ -87,7 +73,7 @@ export default {
     padding: 10px;
 }
 
-.option {
+.sh-option {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -96,51 +82,16 @@ export default {
     border-bottom: 1px solid #e1e9f0;
 }
 
-.option input[type="checkbox"] {
-    margin-right: 8px;
-    margin-left: 0;
-    transform: translateY(1px);
-}
-
-.option:last-child {
+.sh-option:last-child {
     border-bottom: none;
 }
 
-.option input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #ccc;
-    border-radius: 3px;
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-}
-
-.option input[type="checkbox"]:checked {
-    background-color: #10B981;
-    border-color: #10B981;
-    background-image: url('../../assets/check.svg');
-    background-size: 10px 10px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.option input[type="checkbox"]:checked::before {
-    color: #ffffff;
-    font-size: 14px;
-    position: absolute;
-    left: 2px;
-    top: -1px;
-}
-
-.option-icon {
+.sh-option-icon {
     width: 20px;
     height: 20px;
 }
 
-.placeholder {
+.sh-placeholder {
     color: #50606E;
 }
 </style>

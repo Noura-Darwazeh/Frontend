@@ -1,28 +1,30 @@
 <template>
-    <div class="search">
-        <img src="../../assets/search.svg" alt="search" class="search-icon" />
-        <input placeholder="Search"></input>
+    <div class="sh-search">
+        <img src="../../assets/search.svg" alt="search" class="sh-search-icon" />
+        <input class="sh-input" placeholder="Search" />
     </div>
 </template>
 
-<style>
-.search {
+<style scoped>
+.sh-search {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
     width: 200px;
     border: 1px solid #D7DEE4;
-    border-radius: 5PX;
+    border-radius: 5px;
     background-color: #FFFFFF;
-    padding: 10px;
+    padding: 10px !important;
 }
 
-input {
+.sh-input {
     border: none;
+    outline: none;
+    width: 100%;
 }
 
-::placeholder {
+.sh-input::placeholder {
     color: #BDC8D1;
 }
 </style>

@@ -16,6 +16,8 @@ import infoCircle from '../../assets/info-circle.svg';
 import pencil from '../../assets/pencil-01.svg';
 import trash from '../../assets/trash.svg';
 
+
+
 export default {
   name: "MultiSelect",
   data() {
@@ -32,6 +34,25 @@ export default {
     },
     setActive(option) {
       this.activeOption = option;
+
+      if (option === 'Edit') {
+        const unitData = {
+          unitName: "Kia Sorento",
+          fuelType: "Diesel",
+          tankCapacity: 300,
+          unitModel: "2023",
+          engineSerial: "498-02358",
+          chassisSerial: "1HGBH41JXMN109186",
+          oilConsumption: "60",
+          color: "#000000",
+          licenseExpiry: "2023-07-29",
+          insuranceExpiry: "2023-07-29",
+          tags: "SUV"
+        }
+
+        this.$emit("edit", unitData)
+
+      }
     }
   },
 };

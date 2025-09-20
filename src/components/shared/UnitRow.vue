@@ -1,9 +1,13 @@
 <template>
   <tr>
     <td>
-      <div class="checkBox">
-        <input type="checkbox" />
-        <p>{{ unit.id }}</p>
+      <div class="checkBoxId">
+        <div>
+          <input type="checkbox" />
+        </div>
+        <div>
+          <p>{{ unit.id }}</p>
+        </div>
       </div>
     </td>
     <td><a href="#">{{ unit.unit }}</a></td>
@@ -23,27 +27,60 @@
 
     </td>
     <td>
-      <V />
+
+      <V @edit="openEditModal" />
+      <UnitModal id="unitModal" :mode="modalMode" v-model="selectedUnit" @submit="handleSubmit" />
+
     </td>
+
 
   </tr>
 </template>
 
 <script>
-import V from './OptionsColoumn.vue'
+import { ref } from "vue"
+import V from "./OptionsColoumn.vue"
+import UnitModal from "./UnitModal.vue"
+import * as bootstrap from "bootstrap"
 
 export default {
   name: "UnitRow",
   props: {
     unit: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
-    V
-  }
-};
+    V,
+    UnitModal,
+  },
+  setup(props) {
+    const modalMode = ref("add")
+    const selectedUnit = ref({})
+
+    function openEditModal(unitData) {
+      modalMode.value = "edit"
+
+      selectedUnit.value = { ...unitData }
+
+      const modal = new bootstrap.Modal(document.getElementById("unitModal"))
+      modal.show()
+    }
+
+
+    function handleSubmit(data) {
+      console.log("Save", data)
+    }
+
+    return {
+      modalMode,
+      selectedUnit,
+      openEditModal,
+      handleSubmit,
+    }
+  },
+}
 </script>
 
 <style scoped>
@@ -59,11 +96,17 @@ a {
   text-align: center;
 }
 
-.checkBox {
+.checkBoxId {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
-  color: #8D9DAB
+  color: #8D9DAB;
+
+}
+
+p {
+  margin-top: 10px !important;
 }
 
 .color-circle {

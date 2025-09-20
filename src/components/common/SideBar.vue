@@ -98,7 +98,7 @@ export default {
 }
 
 .sidebar {
-  width: 250px;
+  width: 270px;
   background-color: #ffffff;
   padding: 20px;
   height: 100vh;
@@ -107,7 +107,7 @@ export default {
 }
 
 .sidebar-container.collapsed .sidebar {
-  width: 70px;
+  width: 120px;
   padding: 20px 10px;
 }
 
