@@ -16,8 +16,6 @@ import infoCircle from '../../assets/info-circle.svg';
 import pencil from '../../assets/pencil-01.svg';
 import trash from '../../assets/trash.svg';
 
-
-
 export default {
   name: "MultiSelect",
   data() {
@@ -34,6 +32,10 @@ export default {
     },
     setActive(option) {
       this.activeOption = option;
+
+       if (option === 'Unit details') {
+        this.$emit("show-details"); 
+      }
 
       if (option === 'Edit') {
         const unitData = {
@@ -61,6 +63,10 @@ export default {
 <style scoped>
 .multi-select {
   position: relative;
+  background-color: #F73A1D;
+  /* margin-top: 30px; */
+  text-align: center;
+ 
 }
 
 .options {

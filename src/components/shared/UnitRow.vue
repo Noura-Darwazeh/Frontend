@@ -28,9 +28,9 @@
     </td>
     <td>
 
-      <V @edit="openEditModal" />
+      <V @show-details="openUnitDetailsModal" @edit="openEditModal" />
       <UnitModal id="unitModal" :mode="modalMode" v-model="selectedUnit" @submit="handleSubmit" />
-
+      <UnitDetailsModal />
     </td>
 
 
@@ -41,6 +41,7 @@
 import { ref } from "vue"
 import V from "./OptionsColoumn.vue"
 import UnitModal from "./UnitModal.vue"
+import UnitDetailsModal from '../../moduls/units/components/UnitDetailsModal.vue'
 import * as bootstrap from "bootstrap"
 
 export default {
@@ -54,6 +55,7 @@ export default {
   components: {
     V,
     UnitModal,
+    UnitDetailsModal,
   },
   setup(props) {
     const modalMode = ref("add")
@@ -68,6 +70,10 @@ export default {
       modal.show()
     }
 
+    function openUnitDetailsModal() {
+      const modal = new bootstrap.Modal(document.getElementById("unitDetailsModal"))
+      modal.show()
+    }
 
     function handleSubmit(data) {
       console.log("Save", data)
@@ -78,12 +84,19 @@ export default {
       selectedUnit,
       openEditModal,
       handleSubmit,
+      openUnitDetailsModal,
     }
   },
 }
 </script>
 
 <style scoped>
+/* tr{
+  background-color: #8D9DAB !important; */
+   /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+
 a {
   color: #0568A0;
 }
