@@ -63,8 +63,6 @@ export default {
 <style scoped>
 .multi-select {
   position: relative;
-  background-color: #F73A1D;
-  /* margin-top: 30px; */
   text-align: center;
  
 }
