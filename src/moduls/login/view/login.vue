@@ -7,7 +7,7 @@
         <div class="w-30">
           <!-- Logo -->
           <div class="mb-5 mt-4 text-center">
-            <img src="./assets/login/logo.svg" alt="logo" />
+            <img src="../../../assets/login/logo.svg" alt="logo" />
           </div>
 
           <h4 class="fw-bold mb-5 text-center">Welcome</h4>
@@ -131,12 +131,11 @@
 </template>
 
 <script>
-import Language from './components/shared/Language.vue';
-import SelectBtn from './components/shared/Select.vue';
 
+
+import SelectBtn from '../../../components/shared/Select.vue';
 export default {
   components: {
-    Language,
     SelectBtn
   }
 }

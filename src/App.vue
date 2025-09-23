@@ -1,15 +1,18 @@
 <script setup>
-import UnitsTable from './moduls/units/view/units.vue'
 import SideBar from './components/common/SideBar.vue'
 import MainHeader from './components/common/Header.vue'
 </script>
 
 <template>
-  <div class="containerApp">
+  <div v-if="$route.meta.hideLayout">
+    <router-view />
+  </div>
+
+  <div v-else class="containerApp">
     <SideBar />
     <div class="RightContent">
       <MainHeader />
-      <UnitsTable :units="units" />
+      <router-view />
     </div>
   </div>
 </template>
@@ -17,10 +20,10 @@ import MainHeader from './components/common/Header.vue'
 <style>
 .containerApp {
   display: flex;
-  align-items: self-start;
+  align-items: flex-start;
 }
 
-.RightContent{
+.RightContent {
   background-color: #f0f5fa !important;
   width: 100%;
   padding: 10px 20px;
