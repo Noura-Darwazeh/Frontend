@@ -7,7 +7,7 @@ const routes = [
         path: '/',
         name: 'home',
         component: Units,
-        // meta: { requiresAuth: true }
+        meta: { requiresAuth: true }
     },
     {
         path: '/units',
@@ -30,18 +30,17 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    console.log("to",to.name);
-    const token = localStorage.getItem("token");
-console.log();
+  const token = localStorage.getItem("token");
 
+  if (to.meta.requiresAuth && !token) {
+    return next({ name: "login" });
+  }
 
-    if (to.meta.requiresAuth && !token) {
-        next("/login"); // إذا مافي توكن يرجعو لوج ان
-    } else if(token && to.name=="login") {
-        next("/units");
-    }else{
-        next();
+  if (token && to.name === "login") {
+    return next({ name: "units" });
+  }
 
-    }
+  return next();
 });
+
 export default router
