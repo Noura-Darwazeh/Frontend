@@ -15,13 +15,13 @@
           <!-- Email -->
           <div class="mb-3">
             <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" placeholder="name@email.com" />
+            <input type="email" v-model="username" class="form-control" placeholder="name@email.com" />
           </div>
 
           <!-- Password -->
           <div class="mb-3 position-relative">
             <label class="form-label">Password</label>
-            <input type="password" class="form-control" placeholder="Enter password" />
+            <input type="password" v-model="password" class="form-control" placeholder="Enter password" />
             <a href="#" class="small position-absolute end-0 top-0 text-decoration-none text-primary">Forgot
               password?</a>
           </div>
@@ -34,7 +34,7 @@
 
           <!-- Login Button -->
           <div class="d-grid mb-3">
-            <button class="btn btn-primary">Log in</button>
+            <button class="btn btn-primary" @click="login">Log in</button>
           </div>
 
           <p class="text-muted small text-secondary">
@@ -130,16 +130,39 @@
   </div>
 </template>
 
-<script>
-
-
+<script setup>
 import SelectBtn from '../../../components/shared/Select.vue';
-export default {
-  components: {
-    SelectBtn
+import { ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
+const username = ref("");
+const password = ref("");
+const router = useRouter();
+
+const login = async () => {
+  try {
+    const response = await axios.post("http://192.168.100.22:8091/api/auth/login", {
+      username: username.value,
+      password: password.value,
+      type: "web"
+    });
+    const token = response.data.authorization?.token;
+
+
+    if (token) {
+      localStorage.setItem("token", token);
+      router.push("/units");
+    } else {
+      alert("error");
+      console.log('error')
+    }
+  } catch (error) {
+    alert("incorrect username or password");
   }
-}
+};
 </script>
+
 
 <style scoped>
 .container-fluid,
