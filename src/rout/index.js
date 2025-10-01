@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Units from '../moduls/units/view/units.vue'
 import Login from '../moduls/login/view/login.vue'
-
+import Dashboard from '../moduls/dashboard/view/dashboard.vue'
 const routes = [
     {
         path: '/',
@@ -21,7 +21,13 @@ const routes = [
         name: 'login',
         component: Login,
         meta: { hideLayout: true }
-    }
+    },
+    {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: Dashboard,
+        meta: { requiresAuth: true }
+    },
 ]
 
 const router = createRouter({

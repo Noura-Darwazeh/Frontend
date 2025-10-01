@@ -1,39 +1,30 @@
 <template>
   <tr>
-    <td>
+    <td v-if="visibleColumns.includes('id')">
       <div class="checkBoxId">
-        <div>
-          <input type="checkbox" />
-        </div>
-        <div>
-          <p>{{ unit.id }}</p>
-        </div>
+        <input type="checkbox" />
+        <p>{{ unit.id }}</p>
       </div>
     </td>
-    <td><a href="#">{{ unit.unit }}</a></td>
-    <td>{{ unit.driver }}</td>
-    <td class="lightLine">{{ unit.phone }}</td>
-    <td class="centerLine">
-      <span class="color-circle" :style="{ backgroundColor: unit.color, border: '1px solid #dddddd' }"></span>
+
+    <td v-if="visibleColumns.includes('unit')"><a href="#">{{ unit.unit }}</a></td>
+    <td v-if="visibleColumns.includes('driver')">{{ unit.driver }}</td>
+    <td v-if="visibleColumns.includes('phone')" class="lightLine">{{ unit.phone }}</td>
+    <td v-if="visibleColumns.includes('color')" class="centerLine">
+      <span class="color-circle" :style="{ backgroundColor: unit.color, border: '1px solid #ddd' }"></span>
     </td>
-    <td class="lightLine ">{{ unit.model }}</td>
-    <td class="lightLine">{{ unit.lastUpdate }}</td>
-    <td>
+    <td v-if="visibleColumns.includes('model')" class="lightLine">{{ unit.model }}</td>
+    <td v-if="visibleColumns.includes('lastUpdate')" class="lightLine">{{ unit.lastUpdate }}</td>
+    <td v-if="visibleColumns.includes('state')">
       <span :class="['state', unit.state === 'ON' ? 'on' : 'off']">{{ unit.state }}</span>
     </td>
-    <td class="lightLine centerLine">{{ unit.devices }}</td>
-    <td class="lightLine">
-      {{ unit.sim }}
-
-    </td>
-    <td>
-
+    <td v-if="visibleColumns.includes('devices')" class="lightLine centerLine">{{ unit.devices }}</td>
+    <td v-if="visibleColumns.includes('sim')" class="lightLine">{{ unit.sim }}</td>
+    <td v-if="visibleColumns.includes('actions')">
       <V @show-details="openUnitDetailsModal" @edit="openEditModal" />
       <UnitModal id="unitModal" :mode="modalMode" v-model="selectedUnit" @submit="handleSubmit" />
-      <UnitDetailsModal />
+      <UnitDetailsModal id="unitDetailsModal" />
     </td>
-
-
   </tr>
 </template>
 
@@ -51,19 +42,22 @@ export default {
       type: Object,
       required: true,
     },
+    visibleColumns: {
+      type: Array,
+      required: true,
+    },
   },
   components: {
     V,
     UnitModal,
     UnitDetailsModal,
   },
-  setup(props) {
+  setup() {
     const modalMode = ref("add")
     const selectedUnit = ref({})
 
     function openEditModal(unitData) {
       modalMode.value = "edit"
-
       selectedUnit.value = { ...unitData }
 
       const modal = new bootstrap.Modal(document.getElementById("unitModal"))
@@ -91,12 +85,6 @@ export default {
 </script>
 
 <style scoped>
-/* tr{
-  background-color: #8D9DAB !important; */
-   /* display: flex; */
-  /* align-items: center; */
-  /* justify-content: center; */
-
 a {
   color: #0568A0;
 }
@@ -115,7 +103,6 @@ a {
   justify-content: center;
   gap: 15px;
   color: #8D9DAB;
-
 }
 
 p {
@@ -147,7 +134,7 @@ p {
 
 .simBox {
   display: flex;
-  gap: 15px
+  gap: 15px;
 }
 
 td {
