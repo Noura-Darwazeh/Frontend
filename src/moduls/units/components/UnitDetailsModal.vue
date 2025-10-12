@@ -11,8 +11,8 @@
         <!-- <ModalHeader statusText="Connected" lastSynced="Last Synced 13:34:33 2023-06-24" infoColor="#778797"
           :checkIcon="CheckIcon" /> -->
 
-        <ModalHeader statusText="Not Synced" lastSynced="Last Synced 13:34:33 2023-06-24" infoColor="#f7941d"
-          :checkIcon="CheckIcon2" />
+        <ModalHeader :vehicleName="unit.name" statusText="Not Synced" lastSynced="Last Synced 13:34:33 2023-06-24"
+          infoColor="#f7941d" :checkIcon="CheckIcon2" />
 
         <div class="modal-body">
           <!-- Tabs -->
@@ -43,23 +43,56 @@
                 <div class="row info-row">
                   <div class="col-6">
                     <div class="label">Vehicle Name</div>
-                    <div class="value">Vehicle 3</div>
+                    <div class="value">{{ unit.name || '-' }}</div>
                   </div>
                   <div class="col-6">
                     <div class="label">Fuel Type</div>
-                    <div class="value">Petrol</div>
+                    <div class="value">{{ unit.fuel_type || '-' }}</div>
                   </div>
                 </div>
 
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">Vehicle Name</div>
-                    <div class="value">Vehicle 3</div>
+                    <div class="label">Tank Capacity</div>
+                    <div class="value">{{ unit.tank_capacity || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Fuel Type</div>
-                    <div class="value">Petrol</div>
+                    <div class="label">Vehicle Model</div>
+                    <div class="value">{{ unit.model || '-' }}</div>
+                  </div>
+                </div>
+
+                <div class="row info-row">
+                  <div class="col-6">
+                    <div class="label">Chassis Serial Number</div>
+                    <div class="value">{{ unit.chassis_serial_number || '-' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="label">Engine Serial Number</div>
+                    <div class="value">{{ unit.engine_serial_number || '-' }}</div>
+                  </div>
+                </div>
+
+                <div class="row info-row">
+                  <div class="col-6">
+                    <div class="label">Oil Consumption(liter/Km)</div>
+                    <div class="value">{{ unit.oil_consumption || '-' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="label">Vehicle Model</div>
+                    <div class="value">{{ unit.model || '-' }}</div>
+                  </div>
+                </div>
+
+                <div class="row info-row">
+                  <div class="col-6">
+                    <div class="label">License Expiry At</div>
+                    <div class="value">{{ unit.license_expiry_at || '-' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="label">Insurance Expiry At</div>
+                    <div class="value">{{ unit.insurance_expiry_at || '-' }}</div>
                   </div>
                 </div>
 
@@ -67,7 +100,7 @@
                   <div class="col-6">
                     <div class=" label">Vehicle Color</div>
                     <div class=" value">
-                      <VehicleColor />
+                      <VehicleColor :color="unit.color" />
                     </div>
                   </div>
 
@@ -95,29 +128,32 @@
 
             <!-- Devices Tab -->
             <div class="tab-pane fade" id="devices">
-              <div class="container-fluid">
-                <div class="row info-row">
-                  <div class="col-6">
-                    <div class="label">Device Number</div>
-                    <div class="value">412589999</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="label">Sim Number</div>
-                    <div class="value">+972569805716</div>
-                  </div>
-                </div>
-
-
-                <div class="row info-row">
-                  <div class="col-6">
-                    <div class="label">Provider Number</div>
-                    <div class="value">1234</div>
+              <div v-if="unit.devices && unit.devices.length">
+                <div class="container-fluid  " v-for="(device, index) in unit.devices" :key="index">
+                  <div class="row info-row">
+                    <div class="col-6">
+                      <div class="label">Device Number</div>
+                      <div class="value">{{ device.device_number || '-' }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="label">Sim Number</div>
+                      <div class="value">{{ device.sim_number || '-' }}</div>
+                    </div>
                   </div>
 
+                  <div class="row info-row">
+                    <div class="col-6">
+                      <div class="label">Provider Number</div>
+                      <div class="value">{{ device.provider?.name || '-' }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
+              <div v-else class="text-center text-muted">
+                No devices found.
+              </div>
+            </div>
             <!-- Drivers Tab -->
             <div class="tab-pane fade" id="drivers">
               <div class="d-flex justify-content-between">
@@ -128,7 +164,6 @@
               <div>
                 <!-- <DriverHistory /> -->
                 <DriverHistory :drivers="driversData" />
-
               </div>
             </div>
           </div>
@@ -146,15 +181,19 @@
 </template>
 
 <script setup>
+
 import ModalHeader from '../../../components/shared/UnitDetailsModalHeader.vue'
 import VehicleColor from '../../../components/shared/VehicleColor.vue';
-import CheckIcon from '../../../assets/record/check.svg';
 import CheckIcon2 from '../../../assets/record/not.svg';
 import DriverHistory from '../../../components/shared/DriverHistory.vue';
-
-// import DriversTimeline from "./DriversTimeline.vue";
 import { ref } from "vue";
 
+const props = defineProps({
+  unit: {
+    type: Object,
+    default: () => ({})
+  }
+})
 const driversData = ref([
   {
     name: "Ahmed Saeed",
@@ -190,7 +229,7 @@ const driversData = ref([
 
 h5 {
   color: #778897;
- font-weight: 400;
+  font-weight: 400;
   font-size: 16px;
 }
 
@@ -219,7 +258,7 @@ h5 {
   border: 1px solid #d7dee4 !important;
   margin: 0 !important;
   padding: 20px;
-
+  margin-bottom: 10px !important;
 }
 
 .label {

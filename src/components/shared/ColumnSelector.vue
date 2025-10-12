@@ -1,14 +1,12 @@
 <template>
   <div class="column-selector">
-    <!-- زر الأعمدة -->
     <button type="button" @click="toggleDropdown">
-      Select Columns ▼
+      <img src="../../assets/settings.svg" />
     </button>
 
-    <!-- القائمة المنسدلة -->
     <div v-if="showDropdown" class="dropdown">
       <div v-for="col in localColumns" :key="col.key">
-        <label>
+        <label v-if="col.key !== 'actions'">
           <input type="checkbox" v-model="col.visible" @change="emitUpdate" />
           {{ col.label }}
         </label>
@@ -19,34 +17,23 @@
 
 <script setup>
 import { ref, reactive, watch } from "vue";
-
-// Props
+import Btn from '../shared/Button.vue'
 const props = defineProps({
-  columns: {
-    type: Array,
-    required: true,
-  },
+  columns: { type: Array, required: true }
 });
 
-// Emit
 const emit = defineEmits(["update-columns"]);
-
 const showDropdown = ref(false);
-
-// نسخة محلية للتعديل على الأعمدة بدون التأثير المباشر على الأب
 const localColumns = reactive(JSON.parse(JSON.stringify(props.columns)));
 
-// فتح/اغلاق القائمة
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value;
 }
 
-// إرسال التحديث للوالد
 function emitUpdate() {
-  emit("update-columns", localColumns);
+  emit("update-columns", JSON.parse(JSON.stringify(localColumns)));
 }
 
-// مراقبة أي تغييرات في الأعمدة من الأب لتحديث النسخة المحلية
 watch(
   () => props.columns,
   (newVal) => {
@@ -57,6 +44,20 @@ watch(
 </script>
 
 <style scoped>
+button {
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px;
+  border: 1px solid #D7DEE4 !important;
+  background-color: #ffffff !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 50px;
+
+}
+
 .column-selector {
   position: relative;
   display: inline-block;

@@ -2,8 +2,8 @@
   <div class="multi-select">
     <img src="../../assets/dots-horizontal.svg" @click="toggleDropdown" alt="icon" width="14" height="14" />
     <div v-if="isOpen" class="options">
-      <label v-for="(option, index) in options" :key="option" class="option"
-        :class="{ active: option === activeOption }" @click="setActive(option)">
+      <label v-for="(option, index) in options" :key="index" class="option" :class="{ active: option === activeOption }"
+        @click="setActive(option)">
         <img :src="optionIcons[index]" class="option-icon" :class="{ 'icon-active': option === activeOption }" />
         {{ option }}
       </label>
@@ -18,6 +18,9 @@ import trash from '../../assets/trash.svg';
 
 export default {
   name: "MultiSelect",
+  props: {
+    rowData: { type: Object, required: true },
+  },
   data() {
     return {
       isOpen: false,
@@ -33,38 +36,20 @@ export default {
     setActive(option) {
       this.activeOption = option;
 
-       if (option === 'Unit details') {
-        this.$emit("show-details"); 
-      }
+      if (option === 'Unit details') this.$emit("show-details", this.rowData);
+      if (option === 'Edit') this.$emit("edit", this.rowData);
+      if (option === 'Delete') this.$emit("delete", this.rowData);
 
-      if (option === 'Edit') {
-        const unitData = {
-          unitName: "Kia Sorento",
-          fuelType: "Diesel",
-          tankCapacity: 300,
-          unitModel: "2023",
-          engineSerial: "498-02358",
-          chassisSerial: "1HGBH41JXMN109186",
-          oilConsumption: "60",
-          color: "#000000",
-          licenseExpiry: "2023-07-29",
-          insuranceExpiry: "2023-07-29",
-          tags: "SUV"
-        }
-
-        this.$emit("edit", unitData)
-
-      }
+      this.isOpen = false;
     }
   },
 };
 </script>
-
 <style scoped>
 .multi-select {
   position: relative;
   text-align: center;
- 
+
 }
 
 .options {

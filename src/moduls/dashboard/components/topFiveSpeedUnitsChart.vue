@@ -10,14 +10,13 @@ import {
 import { BarChart } from "echarts/charts";
 import { CanvasRenderer } from "echarts/renderers";
 import { getTop5SpeedUnits } from '../stores/fiveSpeedUnits';
+import chartHeader from "./chartHeader.vue";
+import refreshIcon from "../../../assets/chart/refresh.svg"; // استيراد الأيقونة
 
 use([TitleComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer]);
 
 const option = ref({
-    title: {
-        text: "Top 5 Speeding",
-        left: "left",
-    },
+
     tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
@@ -56,7 +55,6 @@ onMounted(async () => {
     try {
         const response = await getTop5SpeedUnits();
         const data = response.result.data;
-        console.log(data)
 
 
         const categories = data.map(item => item.vehicle_name);
@@ -75,16 +73,36 @@ onMounted(async () => {
 </script>
 
 <template>
-    <v-chart class="chart" :option="option" autoresize />
+    <div class="chart">
+        <chartHeader title="Top 5 Speeding" :icon="refreshIcon" />
+        <v-chart :option="option" autoresize class="chart-box" />
+    </div>
 </template>
 
-<style>
+<style scoped>
 .chart {
     background-color: white;
-    width: 35%;
-    height: 300px;
-    padding: 10px 20px;
+    width: 30%;
+    height: 350px;
     border: 1px solid #d7dee4;
     border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chart-box {
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 900px) {
+    .chart {
+        width: 100%;
+        align-items: center;
+    }
+
+
 }
 </style>

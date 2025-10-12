@@ -3,11 +3,18 @@ import CircularButton from '../shared/CircularButton.vue'
 import LanguageIcon from '../../assets/language.svg'
 import Notification from '../shared/Notification.vue'
 import User from '../shared/User.vue'
+
+const props = defineProps({
+    title: {
+        type: String,
+        default: 'Units'
+    }
+});
 </script>
 
 <template>
     <div class="header">
-        <h2>Units</h2>
+        <h2>{{ title }}</h2>
         <div class="headerRightSide">
             <Notification />
 
@@ -17,7 +24,6 @@ import User from '../shared/User.vue'
             <User />
         </div>
     </div>
-<!-- <button :class="active ? 'text-red' : 'text-green'"></button> -->
 </template>
 
 <style>

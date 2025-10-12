@@ -1,139 +1,106 @@
-<script>
-import UnitRow from "../../../components/shared/UnitRow.vue";
-import UnitsHeader from "../components/UnitsHeader.vue";
-import { getVehicles } from "../stores/showAllUnits";
-import Btn from "../../../components/shared/Button.vue";
-export default {
-  name: "UnitsTable",
-  components: { UnitRow, UnitsHeader },
-
-  data() {
-    return {
-      localUnits: [],
-      loading: true,
-      error: null,
-      showColumnDropdown: false,
-      columns: [
-        { key: "id", label: "ID", visible: true, sortable: false },
-        { key: "unit", label: "UNIT", visible: true, sortable: true },
-        { key: "driver", label: "DRIVER", visible: true, sortable: true },
-        { key: "phone", label: "PHONE", visible: true, sortable: false },
-        { key: "color", label: "COLOR", visible: true, sortable: false },
-        { key: "model", label: "MODEL", visible: true, sortable: true },
-        { key: "lastUpdate", label: "LAST UPDATE", visible: true, sortable: true },
-        { key: "state", label: "STATE", visible: true, sortable: false },
-        { key: "devices", label: "DEVICES", visible: true, sortable: false },
-        { key: "sim", label: "SIM", visible: true, sortable: false },
-        { key: "actions", label: "", visible: true, sortable: false }
-      ]
-
-    };
-  },
-
-  async mounted() {
-    try {
-      const response = await getVehicles();
-      console.log("Vehicles from API:", response);
-
-      this.localUnits = (response.result.data || []).map(v => ({
-        id: v.id,
-        unit: v.name,
-        driver: v.driver_name,
-        phone: v.driver_phone,
-        color: v.color,
-        model: v.model || v.vehicle_type,
-        lastUpdate: v.last_update_point,
-        state: v.vehicle_status == 1 ? "ON" : "OFF",
-        devices: v.device_number,
-        sim: v.device_id
-      }));
-    } catch (err) {
-      console.error(err);
-      this.error = "Failed to fetch vehicles";
-    } finally {
-      this.loading = false;
-    }
-  }
-};
-</script>
-
 <template>
+  <UnitsHeader :columns="unitsCols" @update-columns="handleColumnsUpdate" />
+
   <div>
-    <UnitsHeader />
+    <BaseTable
+      :columns="unitsCols.filter(col => col.visible)"
+      :data="units"
+      :showCheckbox="true"
+    >
+      <template #cell-color="{ value }">
+        <ColorIndicator :color="value" />
+      </template>
 
-    <div class="column-selector">
-      <button type="button" @click="showColumnDropdown = !showColumnDropdown">
-        Select Columns ▼
-      </button>
-      <div v-if="showColumnDropdown" class="dropdown">
-        <div v-for="col in columns" :key="col.key">
-          <label>
-            <input type="checkbox" v-model="col.visible" /> {{ col.label }}
-          </label>
-        </div>
-      </div>
-    </div>
+      <template #cell-state="{ value }">
+        <StateBadge :isOn="value === 'ON'" />
+      </template>
 
-    <table class="units-table" v-if="!loading && localUnits.length">
-      <thead>
-        <tr>
-          <th v-for="col in columns.filter(c => c.visible)" :key="col.key">
-            <div class="th-with-icon">
-              <input v-if="col.key === 'id'" type="checkbox" />
-              <span v-else>{{ col.label }}</span>
-              <img v-if="col.sortable && col.key !== 'id'" src="../../../assets/chevron-selector-vertical.svg"
-                alt="icon" width="14" height="14" />
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <UnitRow v-for="unit in localUnits" :key="unit.id" :unit="unit"
-          :visible-columns="columns.filter(c => c.visible).map(c => c.key)" />
+      <template #cell-actions="{ row }">
+        <MultiSelect
+          :row-data="row"
+          @show-details="openUnitDetailsModal"
+          @edit="openEditModal"
+          @delete="deleteUnit"
+        />
+      </template>
+    </BaseTable>
 
-      </tbody>
-    </table>
-
-    <div v-else-if="loading">Loading...</div>
-    <div v-else-if="error">{{ error }}</div>
-    <div v-else>No units found.</div>
+    <UnitModal id="unitModal" v-model="selectedUnit" :mode="modalMode" @submit="handleSubmit" />
+    <UnitDetailsModal id="unitDetailsModal" :unit="selectedUnit" />
   </div>
 </template>
 
-<style scoped>
-.units-table {
-  background-color: #ffffff;
-  width: 100%;
-  margin-top: 20px;
-  border: 1px solid #D7DEE4;
-  padding: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 12px;
-  border-radius: 6px;
-  overflow: hidden;
+<script setup>
+import { ref, onMounted } from 'vue';
+import BaseTable from "../../../components/shared/Table.vue";
+import UnitsHeader from "../components/UnitsHeader.vue";
+import ColorIndicator from "../../../components/shared/VehicleColor.vue";
+import StateBadge from "../../../components/shared/VehicleOnOff.vue";
+import MultiSelect from '../../../components/shared/OptionsColoumn.vue';
+import UnitModal from "../../../components/shared/UnitModal.vue";
+import UnitDetailsModal from '../components/UnitDetailsModal.vue';
+import { getVehicles } from "../stores/showAllUnits";
+import { getVehicleById } from "../stores/showAllUnits";
+import { unitColumns } from '../stores/InitialData';
+import * as bootstrap from "bootstrap";
+
+const units = ref([]);
+const unitsCols = ref([...unitColumns]);
+const selectedUnit = ref({});
+const modalMode = ref("add");
+
+onMounted(async () => {
+  const response = await getVehicles();
+  units.value = response.result.data.map((v) => ({
+    id: v.id,
+    unit: v.name,
+    driver: v.driver_name,
+    color: v.color,
+    phone: v.driver_phone,
+    model: v.model || v.vehicle_type,
+    lastUpdate: v.last_update_point,
+    state: v.vehicle_status == 1 ? "ON" : "OFF",
+    devices: v.device_number,
+    sim: v.device_id,
+  }));
+});
+
+function handleColumnsUpdate(updatedColumns) {
+  unitsCols.value = updatedColumns;
 }
 
-thead {
-  background-color: #f0f5fa;
-  color: #50606e;
+function openEditModal(unitData) {
+  modalMode.value = "edit";
+  selectedUnit.value = { ...unitData };
+  const modal = new bootstrap.Modal(document.getElementById("unitModal"));
+  modal.show();
+}
+async function openUnitDetailsModal(unitData) {
+  try {
+    // نجيب البيانات من السيرفر حسب ID
+    const vehicleDetails = await getVehicleById(unitData.id);
+
+    // نخزن البيانات في selectedUnit
+    selectedUnit.value = { ...vehicleDetails };
+
+    // نفتح المودال
+    const modal = new bootstrap.Modal(document.getElementById("unitDetailsModal"));
+    modal.show();
+  } catch (error) {
+    console.error('Failed to fetch vehicle details:', error);
+  }
+}
+// function openUnitDetailsModal(unitData) {
+//   selectedUnit.value = { ...unitData };
+//   const modal = new bootstrap.Modal(document.getElementById("unitDetailsModal"));
+//   modal.show();
+// }
+
+function deleteUnit(unitData) {
+  console.log("Delete unit:", unitData);
 }
 
-th,
-td {
-  padding: 12px;
-  text-align: left;
+function handleSubmit(data) {
+  console.log("Save", data);
 }
-
-.th-with-icon {
-  display: flex;
-  align-items: self-start;
-  justify-content: center;
-  gap: 2px;
-}
-
-.units-table td {
-  border-bottom: 1px solid #ddd;
-}
-
-</style>
+</script>

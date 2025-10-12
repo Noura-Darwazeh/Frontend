@@ -3,10 +3,8 @@
     <img src="../../assets/record/vehicle.svg" width="56" class="me-2 mt-2" alt="car-icon" />
     <div>
       <div class="d-flex align-items-center gap-2">
-
-        <h5 class="fw-bold fs-3 mb-0">Vehicle3</h5>
+        <h5 class="fw-bold fs-3 mb-0">{{ vehicleName }}</h5>
         <VehicleOnOff :isOn="true" :icon="OnOffIcon" bgColor="#dbf5ec" />
-
         <VehicleSpeed :value="73" />
       </div>
       <!-- <VehicleOnOff :isOn="false" :icon="OnOffIcon" bgColor="#d7dee4" /> -->
@@ -23,7 +21,7 @@ import VehicleSpeed from './VehicleSpeed.vue';
 import VehicleOnOff from './VehicleOnOff.vue';
 import OnOffIcon from '../../assets/record/onoff.svg';
 const props = defineProps({
-
+vehicleName: String, 
   checkIcon: String,
   statusText: String,
   lastSynced: String,

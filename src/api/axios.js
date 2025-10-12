@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://192.168.100.22:8091/api',
-  timeout: 10000,
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
     'Selected-Account': 955,
@@ -19,25 +19,5 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
-export const getVehicles = async () => {
-  try {
-    const response = await api.get('/vehicles');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching vehicles:', error);
-    throw error;
-  }
-};
-
-export const getVehicleById = async (id) => {
-  try{
-    const response = await api.get(`/vehicles/${id}`);
-    return response.data.result;
-  } catch (error){
-    console.error('Error fetching vehicle by ID:', error);
-    throw error;
-  }
-};
 
 export default api;

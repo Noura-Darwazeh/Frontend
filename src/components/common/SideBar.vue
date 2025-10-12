@@ -13,16 +13,19 @@
       <nav>
         <ul>
           <li :class="{ active: activeItem === 'dashboard' }">
-            <a href="#" @click.prevent="setActive('dashboard')">
+            <router-link :to="{ name: 'dashboard' }" @click.native="setActive('dashboard')">
               <img class="icon" src="../../assets/dashboard.svg" alt="" />
               <span v-if="!isCollapsed">Dashboard</span>
-            </a>
+            </router-link>
+
           </li>
           <li :class="{ active: activeItem === 'units' }">
-            <a href="#" @click.prevent="setActive('units')">
+            <!-- <a href="#" @click.prevent="setActive('units')"> -->
+            <router-link :to="{ name: 'units' }" @click.native="setActive('units')">
               <img class="icon" src="../../assets/units.svg" alt="" />
               <span v-if="!isCollapsed">Units</span>
-            </a>
+              <!-- </a> -->
+            </router-link>
           </li>
           <li :class="{ active: activeItem === 'drivers' }">
             <a href="#" @click.prevent="setActive('drivers')">

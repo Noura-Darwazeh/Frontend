@@ -1,6 +1,9 @@
 <script setup>
+import { useRoute } from 'vue-router';
+
 import SideBar from './components/common/SideBar.vue'
 import MainHeader from './components/common/Header.vue'
+const route = useRoute();
 </script>
 
 <template>
@@ -11,7 +14,7 @@ import MainHeader from './components/common/Header.vue'
   <div v-else class="containerApp">
     <SideBar />
     <div class="RightContent">
-      <MainHeader />
+      <MainHeader :title="route.meta.title" />
       <router-view />
     </div>
   </div>

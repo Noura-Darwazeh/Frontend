@@ -13,7 +13,7 @@ const routes = [
         path: '/units',
         name: 'units',
         component: Units,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true,title: 'Units' }
     },
 
     {
@@ -26,7 +26,7 @@ const routes = [
         path: '/dashboard',
         name: 'dashboard',
         component: Dashboard,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, title: 'Dashboard' }
     },
 ]
 
