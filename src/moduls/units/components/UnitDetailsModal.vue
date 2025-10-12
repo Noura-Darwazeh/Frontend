@@ -106,7 +106,7 @@
 
                   <div class="col-6">
                     <div class=" label">Vehicle Icon</div>
-                    <div class=" value">Car</div>
+                    <div class=" value">{{ unit.icon || '-' }}</div>
                   </div>
                 </div>
 
