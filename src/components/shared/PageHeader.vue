@@ -25,7 +25,7 @@ function openAdd() {
 }
 
 function handleAdd(data) {
-    console.log("Added Unit:", data);
+    console.log("Added Unit hhhhhhhh:", data);
 }
 </script>
 

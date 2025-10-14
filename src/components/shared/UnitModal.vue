@@ -9,7 +9,6 @@
             {{ mode === 'add' ? 'Add New Unit' : 'Edit Unit' }}
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
           <div class="header-line"></div>
         </div>
 
@@ -19,20 +18,19 @@
           <div class="mb-3 row g-5">
             <div class="col">
               <label>Unit Name</label>
-              <input v-model="localForm.unitName" type="text" placeholder="E.g Kia Sorento"
+              <input v-model="localForm.name" type="text" placeholder="E.g Kia Sorento"
                 class="form-control custom-input" />
-
             </div>
 
             <div class="col">
               <label>Fuel Type</label>
               <div class="d-flex ">
                 <button type="button" class="btn leftBtn"
-                  :class="localForm.fuelType === 'Petrol' ? 'btn-primary' : 'btn-outline-secondary'"
-                  @click="localForm.fuelType = 'Petrol'">Petrol</button>
+                  :class="localForm.fuel_type === 'petrol_95' ? 'btn-primary' : 'btn-outline-secondary'"
+                  @click="localForm.fuel_type = 'petrol_95'">Petrol</button>
                 <button type="button" class="btn rightBtn"
-                  :class="localForm.fuelType === 'Diesel' ? 'btn-primary' : 'btn-outline-secondary'"
-                  @click="localForm.fuelType = 'Diesel'">Diesel</button>
+                  :class="localForm.fuel_type === 'diesel' ? 'btn-primary' : 'btn-outline-secondary'"
+                  @click="localForm.fuel_type = 'diesel'">Diesel</button>
               </div>
             </div>
           </div>
@@ -40,22 +38,21 @@
           <!-- Unit Icon -->
           <div class="container-fluid p-0">
             <label class="form-label">Unit Icon</label>
-            <Slider />
+            <Slider v-model="localForm.unitIcon" />
           </div>
 
           <!-- Tank Capacity & Unit Model -->
           <div class="mb-3 mt-3 row g-2">
             <div class="col">
               <label>Tank Capacity</label>
-              <input v-model="localForm.tankCapacity" type="number" placeholder="300"
+              <input v-model="localForm.tank_capacity" type="number" placeholder="300"
                 class="form-control custom-input" />
             </div>
             <div class="col">
               <label>Unit Model</label>
               <div class="app">
-                <MyDatepicker v-model="date" />
+                <MyDatepicker v-model="localForm.unitModel" />
               </div>
-
             </div>
           </div>
 
@@ -63,12 +60,12 @@
           <div class="mb-3 row g-2">
             <div class="col">
               <label>Engine Serial Number</label>
-              <input v-model="localForm.engineSerial" type="text" placeholder="E.g 498 - 02358"
+              <input v-model="localForm.engine_serial_number" type="text" placeholder="E.g 498 - 02358"
                 class="form-control custom-input" />
             </div>
             <div class="col">
               <label>Chassis Serial Number</label>
-              <input v-model="localForm.chassisSerial" type="text" placeholder="E.g 1HGBH41JXMN109186"
+              <input v-model="localForm.chassis_serial_number" type="text" placeholder="E.g 1HGBH41JXMN109186"
                 class="form-control custom-input" />
             </div>
           </div>
@@ -77,7 +74,7 @@
           <div class="mb-3 row g-2">
             <div class="col">
               <label>Oil Consumption(liter/Km)</label>
-              <input v-model="localForm.oilConsumption" type="text" placeholder="E.g 60"
+              <input v-model="localForm.oil_consumption" type="text" placeholder="E.g 60"
                 class="form-control custom-input" />
             </div>
           </div>
@@ -100,17 +97,13 @@
             <div class="col">
               <label>License Expiry At</label>
               <div class="app">
-
-                <MyDatepicker v-model="date" />
-
+                <MyDatepicker v-model="localForm.licenseExpiry" />
               </div>
             </div>
             <div class="col">
               <label>Insurance Expiry At</label>
               <div class="app">
-
-                <MyDatepicker v-model="date" />
-
+                <MyDatepicker v-model="localForm.insuranceExpiry" />
               </div>
             </div>
           </div>
@@ -150,31 +143,22 @@ const props = defineProps({
   mode: { type: String, default: "add" }, // add | edit
   modelValue: { type: Object, default: () => ({}) },
 })
-const date = ref(null);
+
 const emit = defineEmits(["update:modelValue", "submit"])
 
-
 const colors = ref([
-  "#000000",
-  "#FFFFFF",
-  "#FF0000",
-  "#0000FF",
-  "#008000",
-  "#FFFF00",
-  "#FFA500",
-  "#808080",
+  "#000000","#FFFFFF","#FF0000","#0000FF","#008000","#FFFF00","#FFA500","#808080",
 ])
 
 const localForm = reactive({
-  unitName: "",
-  fuelType: "Diesel",
+  name: "",
+  fuel_type: "diesel",
   unitIcon: "",
-  tankCapacity: "",
+  tank_capacity: "",
   unitModel: "",
-  engineSerial: "",
-  chassisSerial: "",
-  oilConsumption: "",
-  eTag: "",
+  engine_serial_number: "",
+  chassis_serial_number: "",
+  oil_consumption: "",
   color: "",
   licenseExpiry: "",
   insuranceExpiry: "",
@@ -185,7 +169,13 @@ const localForm = reactive({
 watch(
   () => props.modelValue,
   (newVal) => {
-    Object.assign(localForm, newVal)
+    if (!newVal) return;
+    Object.assign(localForm, {
+      ...newVal,
+      unitModel: newVal.model ? new Date(newVal.model + "-01-01") : null,
+      licenseExpiry: newVal.license_expiry_at ? new Date(newVal.license_expiry_at) : null,
+      insuranceExpiry: newVal.insurance_expiry_at ? new Date(newVal.insurance_expiry_at) : null,
+    })
   },
   { deep: true }
 )
@@ -194,7 +184,6 @@ function handleSubmit() {
   emit("submit", localForm)
 }
 </script>
-
 <style scoped>
 .modal-header {
   border: none !important;

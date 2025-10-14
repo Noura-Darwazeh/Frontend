@@ -1,22 +1,42 @@
 <template>
   <div class="app">
-    <Datepicker v-model="date" :enable-time-picker="false" :format="yearOnlyFormatter" />
+    <Datepicker v-model="internalDate" :enable-time-picker="false"  />
 
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch, defineProps, defineEmits } from "vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
-const date = ref(null);
+const props = defineProps({
+  modelValue: { type: [Date, null], default: null }
+})
+const emit = defineEmits(["update:modelValue"]);
+
+const internalDate = ref(props.modelValue);
+
+// لو تغير modelValue من الأب، حدّث internalDate
+watch(() => props.modelValue, val => {
+  internalDate.value = val ? new Date(val) : null;
+});
+
+// لما المستخدم يغيّر التاريخ، نرسل القيمة للأب
+watch(internalDate, val => {
+  emit("update:modelValue", val);
+});
 
 function yearOnlyFormatter(date) {
   if (!date) return '';
   return new Date(date).getFullYear();
 }
 </script>
+
+<!-- <template>
+  <Datepicker v-model="internalDate" :enable-time-picker="false" :format="yearOnlyFormatter" />
+</template> -->
+
 
 <style>
 .dp__theme_light {
