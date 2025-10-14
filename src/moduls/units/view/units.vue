@@ -32,8 +32,7 @@ import UnitModal from "../../../components/shared/UnitModal.vue";
 import UnitDetailsModal from '../components/UnitDetailsModal.vue';
 import { getVehicles } from "../stores/showAllUnits";
 import { getVehicleById } from "../stores/showAllUnits";
-// addVehicle, updateVehicle
-import { addVehicle } from "../stores/showAllUnits";
+import { deleteVehicle } from "../stores/showAllUnits";
 import { updateVehicle } from "../stores/showAllUnits";
 import { unitColumns } from '../stores/InitialData';
 import * as bootstrap from "bootstrap";
@@ -67,7 +66,6 @@ function handleColumnsUpdate(updatedColumns) {
 async function openEditModal(unitData) {
   try {
     modalMode.value = "edit";
-    // جلب كل بيانات السيارة من الـ API
     const vehicleDetails = await getVehicleById(unitData.id);
     selectedUnit.value = { ...vehicleDetails }; // تعبئة بيانات المودال
     const modal = new bootstrap.Modal(document.getElementById("unitModal"));
@@ -88,18 +86,18 @@ async function openUnitDetailsModal(unitData) {
   }
 }
 
-function deleteUnit(unitData) {
-  console.log("Delete unit:", unitData);
+async function deleteUnit(unitData) {
+  try {
+    await deleteVehicle(unitData.id);
+    units.value = units.value.filter((u) => u.id !== unitData.id);
+  } catch (error) {
+    console.error('Failed to delete vehicle:', error);
+    alert('Failed to delete vehicle');
+  }
 }
-
-import axios from "axios";
-
-// import { addVehicle, updateVehicle } from '../../../api/axios';
-// import * as bootstrap from "bootstrap";
 
 async function handleSubmit(data) {
   try {
-    // تجهيز البيانات للإرسال إلى الـ API
     const payload = {
       name: data.name || "",
       tank_capacity: data.tank_capacity || "",
@@ -124,35 +122,13 @@ async function handleSubmit(data) {
     let response;
 
     if (modalMode.value === "add") {
-      // إضافة وحدة جديدة
-      response = await addVehicle(payload);
-      console.log("API Response:", response);
-
-      console.log("Added Unit:", JSON.parse(JSON.stringify(payload)));
-
-      // ✅ إضافة الصف الجديد للجدول مباشرة
-      units.value.push({
-        id: response.result.id,
-        unit: data.name,
-        driver: data.driver_name || "",
-        color: data.color || "",
-        phone: data.driver_phone || "",
-        model: data.unitModel
-          ? new Date(data.unitModel).getFullYear()
-          : data.model || "",
-        lastUpdate: null,
-        state: "OFF",
-        devices: data.device_number || "",
-        sim: data.device_id || "",
-      });
+      console.log("add")
 
     } else {
-      // تعديل وحدة موجودة
       const unitId = selectedUnit.value.id;
       response = await updateVehicle(unitId, payload);
       console.log("Updated:", response);
 
-      // ✅ تحديث الصف الموجود في الجدول
       const index = units.value.findIndex((u) => u.id === unitId);
       if (index !== -1) {
         units.value[index] = {
@@ -170,7 +146,6 @@ async function handleSubmit(data) {
       }
     }
 
-    // ✅ إغلاق المودال بعد الحفظ
     const modalEl = document.getElementById("unitModal");
     const modal = bootstrap.Modal.getInstance(modalEl);
     modal.hide();

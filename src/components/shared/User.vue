@@ -70,7 +70,12 @@ export default {
             alert("تبديل الحساب");
         },
         logout() {
-            alert("تم تسجيل الخروج");
+            try {
+                localStorage.removeItem('token');
+                this.$router.push({ name: 'login' });
+            } catch (e) {
+                console.error('Logout error:', e);
+            }
         },
     },
 };
