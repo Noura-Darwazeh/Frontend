@@ -1,7 +1,13 @@
+<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+</script>
+
 <template>
     <div class="sh-search">
         <img src="../../assets/search.svg" alt="search" class="sh-search-icon" />
-        <input class="sh-input" placeholder="Search" />
+        <input class="sh-input" :placeholder="t('placeholders.search')" />
     </div>
 </template>
 

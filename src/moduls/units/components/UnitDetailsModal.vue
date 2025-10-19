@@ -5,13 +5,13 @@
       <div class="modal-content p-3">
         <!-- Header -->
         <div class="modal-header border-0 p-0">
-          <h5>Unit Details</h5>
+          <h5>{{ $t('unitDetails.title') }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <!-- <ModalHeader statusText="Connected" lastSynced="Last Synced 13:34:33 2023-06-24" infoColor="#778797"
           :checkIcon="CheckIcon" /> -->
 
-        <ModalHeader :vehicleName="unit.name" statusText="Not Synced" lastSynced="Last Synced 13:34:33 2023-06-24"
+        <ModalHeader :vehicleName="unit.name" :statusText="$t('unitDetails.status.notSynced')" :lastSynced="$t('unitDetails.lastSynced', { time: '13:34:33 2023-06-24' })"
           infoColor="#f7941d" :checkIcon="CheckIcon2" />
 
         <div class="modal-body">
@@ -19,18 +19,18 @@
           <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
               <a class="nav-link " data-bs-toggle="tab" href="#info">
-                Info
+                {{ $t('unitDetails.tabs.info') }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link d-flex justify-content-center align-items-center  gap-2" data-bs-toggle="tab"
                 href="#devices">
-                Devices <span class="numOfDevices">3</span>
+                {{ $t('unitDetails.tabs.devices') }} <span class="numOfDevices">3</span>
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" data-bs-toggle="tab" href="#drivers">
-                Drivers
+                {{ $t('unitDetails.tabs.drivers') }}
               </a>
             </li>
           </ul>
@@ -42,11 +42,11 @@
               <div class="container-fluid">
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">Vehicle Name</div>
+                    <div class="label">{{ $t('unitDetails.fields.vehicleName') }}</div>
                     <div class="value">{{ unit.name || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Fuel Type</div>
+                    <div class="label">{{ $t('unitDetails.fields.fuelType') }}</div>
                     <div class="value">{{ unit.fuel_type || '-' }}</div>
                   </div>
                 </div>
@@ -54,58 +54,58 @@
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">Tank Capacity</div>
+                    <div class="label">{{ $t('unitDetails.fields.tankCapacity') }}</div>
                     <div class="value">{{ unit.tank_capacity || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Vehicle Model</div>
+                    <div class="label">{{ $t('unitDetails.fields.vehicleModel') }}</div>
                     <div class="value">{{ unit.model || '-' }}</div>
                   </div>
                 </div>
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">Chassis Serial Number</div>
+                    <div class="label">{{ $t('unitDetails.fields.chassisSerial') }}</div>
                     <div class="value">{{ unit.chassis_serial_number || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Engine Serial Number</div>
+                    <div class="label">{{ $t('unitDetails.fields.engineSerial') }}</div>
                     <div class="value">{{ unit.engine_serial_number || '-' }}</div>
                   </div>
                 </div>
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">Oil Consumption(liter/Km)</div>
+                    <div class="label">{{ $t('unitDetails.fields.oilConsumption') }}</div>
                     <div class="value">{{ unit.oil_consumption || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Vehicle Model</div>
+                    <div class="label">{{ $t('unitDetails.fields.vehicleModel') }}</div>
                     <div class="value">{{ unit.model || '-' }}</div>
                   </div>
                 </div>
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class="label">License Expiry At</div>
+                    <div class="label">{{ $t('unitDetails.fields.licenseExpiry') }}</div>
                     <div class="value">{{ unit.license_expiry_at || '-' }}</div>
                   </div>
                   <div class="col-6">
-                    <div class="label">Insurance Expiry At</div>
+                    <div class="label">{{ $t('unitDetails.fields.insuranceExpiry') }}</div>
                     <div class="value">{{ unit.insurance_expiry_at || '-' }}</div>
                   </div>
                 </div>
 
                 <div class="row info-row">
                   <div class="col-6">
-                    <div class=" label">Vehicle Color</div>
+                    <div class=" label">{{ $t('unitDetails.fields.vehicleColor') }}</div>
                     <div class=" value">
                       <VehicleColor :color="unit.color" />
                     </div>
                   </div>
 
                   <div class="col-6">
-                    <div class=" label">Vehicle Icon</div>
+                    <div class=" label">{{ $t('unitDetails.fields.vehicleIcon') }}</div>
                     <div class=" value">{{ unit.icon || '-' }}</div>
                   </div>
                 </div>
@@ -114,7 +114,7 @@
                 <div class="row info-row">
                   <div class="col-6">
 
-                    <div class=" label">Tags</div>
+                    <div class=" label">{{ $t('unitDetails.fields.tags') }}</div>
                     <div class="value">
                       <span class="tag">First Tag</span>
                       <span class="tag">Tag Two</span>
@@ -151,14 +151,14 @@
               </div>
 
               <div v-else class="text-center text-muted">
-                No devices found.
+                {{ $t('unitDetails.noDevices') }}
               </div>
             </div>
             <!-- Drivers Tab -->
             <div class="tab-pane fade" id="drivers">
               <div class="d-flex justify-content-between">
-                <p class="driverHistoryPar">DRIVER HISTORY</p>
-                <a class="reportLink" href="">Full Report</a>
+                <p class="driverHistoryPar">{{ $t('unitDetails.driverHistory') }}</p>
+                <a class="reportLink" href="">{{ $t('unitDetails.fullReport') }}</a>
 
               </div>
               <div>
@@ -171,9 +171,9 @@
 
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">
-            Close
+            {{ $t('common.close') }}
           </button>
-          <button class="btn btn-primary">Unit Profile →</button>
+          <button class="btn btn-primary">{{ $t('unitDetails.unitProfile') }} →</button>
         </div>
       </div>
     </div>

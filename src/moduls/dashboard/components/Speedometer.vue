@@ -8,6 +8,9 @@ import { CanvasRenderer } from "echarts/renderers";
 import chartHeader from "./chartHeader.vue";
 import dawnloadIcon from "../../../assets/chart/download.svg";
 import { getVehiclesGroupedBySpeed } from "../stores/getTopVehicleSpeed";
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 use([GaugeChart, TooltipComponent, CanvasRenderer]);
 
 const speed = ref(0);
@@ -80,7 +83,7 @@ onUnmounted(() => {
 
 <template>
     <div class="chart">
-        <chartHeader title="Speed Summary" :icon="dawnloadIcon" />
+        <chartHeader :title="t('charts.speed')" :icon="dawnloadIcon" />
         <VChart :option="option" autoresize class="chart-box" />
     </div>
 </template>

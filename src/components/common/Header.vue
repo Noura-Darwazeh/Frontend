@@ -1,9 +1,12 @@
 <script setup>
-import CircularButton from '../shared/CircularButton.vue'
-import LanguageIcon from '../../assets/language.svg'
+import LanguageSwitcher from '../shared/LanguageSwitcher.vue'
 import Notification from '../shared/Notification.vue'
 import User from '../shared/User.vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
+const { t } = useI18n()
+const route = useRoute()
 const props = defineProps({
     title: {
         type: String,
@@ -14,13 +17,11 @@ const props = defineProps({
 
 <template>
     <div class="header">
-        <h2>{{ title }}</h2>
+        <h2>{{ t(`header.titles.${route.name}`) }}</h2>
         <div class="headerRightSide">
             <Notification />
-
-            <CircularButton :icon="LanguageIcon" />
+            <LanguageSwitcher />
             <img src="../../assets/user.svg" alt="" />
-
             <User />
         </div>
     </div>

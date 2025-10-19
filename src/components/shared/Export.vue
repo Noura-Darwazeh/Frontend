@@ -2,7 +2,7 @@
     <div class="sh-multi-select">
         <div class="sh-select-box" @click="toggleDropdown">
             <span class="sh-placeholder">
-                Export
+                {{$t('buttons.export')}}
             </span>
         </div>
 

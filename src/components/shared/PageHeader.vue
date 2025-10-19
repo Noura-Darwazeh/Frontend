@@ -34,17 +34,17 @@ function handleAdd(data) {
     <div class="leftSection">
       <Search />
       <Group />
-      <Btn label="Sort" :iconRight="AddIcon" />
-      <SelectBtn option1="All Units" />
+      <Btn :label="$t('buttons.sort')" :iconRight="AddIcon" />
+      <SelectBtn :option1="$t('filters.allUnits')" />
       <Export />
-      <Btn :iconRight="RefreshIcon" />
-      <Btn label="Deleted Items" :iconLeft="TrashIcon" />
+      <Btn :label="$t('buttons.refresh')" :iconRight="RefreshIcon" />
+      <Btn :label="$t('buttons.deletedItems')" :iconLeft="TrashIcon" />
     </div>
 
     <ColumnSelector v-if="showColsList" :columns="$attrs.columns" @update-columns="handleColumnsUpdate" />
 
     <div>
-      <Btn data-bs-toggle="modal" data-bs-target="#addUnitModal" @click="openAdd" :iconLeft="PlusIcon" label="Add Unit"
+      <Btn data-bs-toggle="modal" data-bs-target="#addUnitModal" @click="openAdd" :iconLeft="PlusIcon" :label="$t('buttons.addUnit')"
         bg-color="#10B981" color="#fff" />
       <AddUnitModal id="addUnitModal" mode="add" v-model="newUnit" @submit="handleAdd" />
     </div>

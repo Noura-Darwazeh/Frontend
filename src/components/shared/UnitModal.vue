@@ -6,7 +6,7 @@
         <div class="modal-header p-0 mb-3 pb-4 position-relative">
           <img src="../../assets/record/truck-01.svg" alt="unit icon" class="me-2" />
           <h5 class="modal-title">
-            {{ mode === 'add' ? 'Add New Unit' : 'Edit Unit' }}
+            {{ mode === 'add' ? $t('unitModal.header.add') : $t('unitModal.header.edit') }}
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           <div class="header-line"></div>
@@ -17,39 +17,39 @@
           <!-- Unit Name & Fuel Type -->
           <div class="mb-3 row g-5">
             <div class="col">
-              <label>Unit Name</label>
-              <input v-model="localForm.name" type="text" placeholder="E.g Kia Sorento"
+              <label>{{ $t('unitModal.fields.unitName') }}</label>
+              <input v-model="localForm.name" type="text" :placeholder="$t('unitModal.placeholders.unitName')"
                 class="form-control custom-input" />
             </div>
 
             <div class="col">
-              <label>Fuel Type</label>
+              <label>{{ $t('unitModal.fields.fuelType') }}</label>
               <div class="d-flex ">
                 <button type="button" class="btn leftBtn"
                   :class="localForm.fuel_type === 'petrol_95' ? 'btn-primary' : 'btn-outline-secondary'"
-                  @click="localForm.fuel_type = 'petrol_95'">Petrol</button>
+                  @click="localForm.fuel_type = 'petrol_95'">{{ $t('unitModal.fuelTypes.petrol') }}</button>
                 <button type="button" class="btn rightBtn"
                   :class="localForm.fuel_type === 'diesel' ? 'btn-primary' : 'btn-outline-secondary'"
-                  @click="localForm.fuel_type = 'diesel'">Diesel</button>
+                  @click="localForm.fuel_type = 'diesel'">{{ $t('unitModal.fuelTypes.diesel') }}</button>
               </div>
             </div>
           </div>
 
           <!-- Unit Icon -->
           <div class="container-fluid p-0">
-            <label class="form-label">Unit Icon</label>
+            <label class="form-label">{{ $t('unitModal.fields.unitIcon') }}</label>
             <Slider v-model="localForm.unitIcon" />
           </div>
 
           <!-- Tank Capacity & Unit Model -->
           <div class="mb-3 mt-3 row g-2">
             <div class="col">
-              <label>Tank Capacity</label>
-              <input v-model="localForm.tank_capacity" type="number" placeholder="300"
+              <label>{{ $t('unitModal.fields.tankCapacity') }}</label>
+              <input v-model="localForm.tank_capacity" type="number" :placeholder="$t('unitModal.placeholders.tankCapacity')"
                 class="form-control custom-input" />
             </div>
             <div class="col">
-              <label>Unit Model</label>
+              <label>{{ $t('unitModal.fields.unitModel') }}</label>
               <div class="app">
                 <MyDatepicker v-model="localForm.unitModel" />
               </div>
@@ -59,13 +59,13 @@
           <!-- Engine Serial & Chassis -->
           <div class="mb-3 row g-2">
             <div class="col">
-              <label>Engine Serial Number</label>
-              <input v-model="localForm.engine_serial_number" type="text" placeholder="E.g 498 - 02358"
+              <label>{{ $t('unitModal.fields.engineSerial') }}</label>
+              <input v-model="localForm.engine_serial_number" type="text" :placeholder="$t('unitModal.placeholders.engineSerial')"
                 class="form-control custom-input" />
             </div>
             <div class="col">
-              <label>Chassis Serial Number</label>
-              <input v-model="localForm.chassis_serial_number" type="text" placeholder="E.g 1HGBH41JXMN109186"
+              <label>{{ $t('unitModal.fields.chassisSerial') }}</label>
+              <input v-model="localForm.chassis_serial_number" type="text" :placeholder="$t('unitModal.placeholders.chassisSerial')"
                 class="form-control custom-input" />
             </div>
           </div>
@@ -73,15 +73,15 @@
           <!-- Oil Consumption -->
           <div class="mb-3 row g-2">
             <div class="col">
-              <label>Oil Consumption(liter/Km)</label>
-              <input v-model="localForm.oil_consumption" type="text" placeholder="E.g 60"
+              <label>{{ $t('unitModal.fields.oilConsumption') }}</label>
+              <input v-model="localForm.oil_consumption" type="text" :placeholder="$t('unitModal.placeholders.oilConsumption')"
                 class="form-control custom-input" />
             </div>
           </div>
 
           <!-- Vehicle Color -->
           <div class="mb-3">
-            <label class="form-label">Vehicle Color</label>
+            <label class="form-label">{{ $t('unitModal.fields.vehicleColor') }}</label>
             <div class="d-flex gap-3 flex-wrap">
               <span v-for="color in colors" :key="color" :style="{ backgroundColor: color }"
                 :class="['rounded-circle border', localForm.color === color ? 'border-primary' : 'border-0']"
@@ -95,13 +95,13 @@
           <!-- License & Insurance -->
           <div class="mb-3 mt-3 row g-2">
             <div class="col">
-              <label>License Expiry At</label>
+              <label>{{ $t('unitModal.fields.licenseExpiry') }}</label>
               <div class="app">
                 <MyDatepicker v-model="localForm.licenseExpiry" />
               </div>
             </div>
             <div class="col">
-              <label>Insurance Expiry At</label>
+              <label>{{ $t('unitModal.fields.insuranceExpiry') }}</label>
               <div class="app">
                 <MyDatepicker v-model="localForm.insuranceExpiry" />
               </div>
@@ -111,10 +111,10 @@
           <!-- Tags -->
           <div class="mb-3 row g-2">
             <div class="col">
-              <label>Tags</label>
+              <label>{{ $t('unitModal.fields.tags') }}</label>
               <div class="input-with-icon">
                 <img src="../../assets/record/search.svg" alt="unit icon" />
-                <input v-model="localForm.tags" type="text" placeholder="Search for tags"
+                <input v-model="tagsText" type="text" :placeholder="$t('unitModal.placeholders.tags')"
                   class="form-control custom-input" style="border:none !important" />
               </div>
             </div>
@@ -122,8 +122,8 @@
 
           <!-- Buttons -->
           <div class="addOrCancel">
-            <button type="button" class="cancelBtn" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="addBtn">{{ mode === 'add' ? 'Add' : 'Save' }}</button>
+            <button type="button" class="cancelBtn" data-bs-dismiss="modal">{{ $t('common.cancel') }}</button>
+            <button type="submit" class="addBtn">{{ mode === 'add' ? $t('common.add') : $t('common.save') }}</button>
           </div>
         </form>
       </div>
@@ -132,7 +132,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, computed } from 'vue'
 import Slider from './Slider.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -181,8 +181,35 @@ watch(
 )
 
 function handleSubmit() {
-  emit("submit", localForm)
+  const prepared = {
+    ...localForm,
+    tags: typeof localForm.tags === 'string' ? localForm.tags.split(',').map(t => t.trim()).filter(Boolean) : localForm.tags
+  }
+  emit("submit", prepared)
 }
+
+// Ensure tags render as a comma-separated string in the input
+const tagsText = computed({
+  get() {
+    if (Array.isArray(localForm.tags)) {
+      return localForm.tags
+        .map((item) => {
+          if (typeof item === 'string') return item
+          if (item && typeof item === 'object') {
+            return item.name || item.label || item.value || JSON.stringify(item)
+          }
+          return ''
+        })
+        .filter(Boolean)
+        .join(', ')
+    }
+    if (typeof localForm.tags === 'object' && localForm.tags) return Object.values(localForm.tags).join(', ')
+    return localForm.tags || ''
+  },
+  set(val) {
+    localForm.tags = val
+  }
+})
 </script>
 <style scoped>
 .modal-header {

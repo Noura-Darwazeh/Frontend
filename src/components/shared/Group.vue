@@ -3,7 +3,7 @@
         <div class="ms-select-box" @click="toggleDropdown">
             <div class="ms-selected-tags">
                 <span v-if="selectedOptions.length === 0" class="ms-placeholder">
-                    Group
+                     {{$t('buttons.group')}}
                 </span>
 
                 <span v-else v-for="(option, index) in selectedOptions" :key="index" class="ms-tag">

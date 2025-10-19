@@ -8,7 +8,7 @@
       <div v-for="col in localColumns" :key="col.key">
         <label v-if="col.key !== 'actions'">
           <input type="checkbox" v-model="col.visible" @change="emitUpdate" />
-          {{ col.label }}
+          {{ $t('columns.' + col.key) }}
         </label>
       </div>
     </div>

@@ -14,6 +14,26 @@
       <template #cell-actions="{ row }">
         <MultiSelect :row-data="row" @show-details="openUnitDetailsModal" @edit="openEditModal" @delete="deleteUnit" />
       </template>
+
+      <template #cell-icon="{ value }">
+        <img v-if="value" :src="getIconPath(value)" alt="icon" width="50" height="50" />
+      </template>
+
+      <template #cell-unit="{ value, row }">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span :style="{ color: getUnitColor(row) }">{{ value }}</span>
+
+          <img :src="getIconPath('unit-address')" alt="location" width="20" height="20" title="location" />
+
+          <img v-if="row.outdated" :src="getIconPath('sync')" alt="outdated" width="20" height="20"
+            title="sync" />
+
+          <img v-if="row.licenseExpired" :src="getIconPath('exp')" alt="license-expired" width="20" height="20"
+            title="license-expired" />
+        </div>
+      </template>
+
+
     </BaseTable>
 
     <UnitModal id="unitModal" v-model="selectedUnit" :mode="modalMode" @submit="handleSubmit" />
@@ -27,7 +47,7 @@ import BaseTable from "../../../components/shared/Table.vue";
 import UnitsHeader from "../components/UnitsHeader.vue";
 import ColorIndicator from "../../../components/shared/VehicleColor.vue";
 import StateBadge from "../../../components/shared/VehicleOnOff.vue";
-import MultiSelect from '../../../components/shared/OptionsColoumn.vue';
+import MultiSelect from '../../../components/shared/Actions.vue';
 import UnitModal from "../../../components/shared/UnitModal.vue";
 import UnitDetailsModal from '../components/UnitDetailsModal.vue';
 import { getVehicles } from "../stores/showAllUnits";
@@ -45,19 +65,41 @@ const modalMode = ref("add");
 onMounted(async () => {
   const response = await getVehicles();
   console.log(response);
-  units.value = response.result.data.map((v) => ({
-    id: v.id,
-    unit: v.name,
-    driver: v.driver_name,
-    color: v.color,
-    phone: v.driver_phone,
-    model: v.model || v.vehicle_type,
-    lastUpdate: v.last_update_point,
-    state: v.vehicle_status == 1 ? "ON" : "OFF",
-    devices: v.device_number,
-    sim: v.device_id,
-  }));
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  units.value = response.result.data.map((v) => {
+    const lastUpdate = new Date(v.last_update_point);
+    const diffHours = (now - lastUpdate) / (1000 * 60 * 60);
+
+
+    const licenseDate = v.license_expiry_at ? new Date(v.license_expiry_at) : null;
+    const licenseDayOnly = licenseDate
+      ? new Date(licenseDate.getFullYear(), licenseDate.getMonth(), licenseDate.getDate())
+      : null;
+
+    const licenseExpired = licenseDayOnly ? today > licenseDayOnly : false;
+
+    return {
+      id: v.id,
+      unit: v.name,
+      driver: v.driver_name,
+      color: v.color,
+      phone: v.driver_phone,
+      model: v.model || v.vehicle_type,
+      lastUpdate: v.last_update_point,
+      state: v.vehicle_status == 1 ? "ON" : "OFF",
+      devices: v.device_number,
+      sim: v.device_id,
+      icon: v.icon,
+      outdated: diffHours > 24,
+      licenseExpired,
+    };
+  });
 });
+
+
 
 function handleColumnsUpdate(updatedColumns) {
   unitsCols.value = updatedColumns;
@@ -67,7 +109,7 @@ async function openEditModal(unitData) {
   try {
     modalMode.value = "edit";
     const vehicleDetails = await getVehicleById(unitData.id);
-    selectedUnit.value = { ...vehicleDetails }; // تعبئة بيانات المودال
+    selectedUnit.value = { ...vehicleDetails };
     const modal = new bootstrap.Modal(document.getElementById("unitModal"));
     modal.show();
   } catch (error) {
@@ -155,5 +197,17 @@ async function handleSubmit(data) {
   }
 }
 
+function getIconPath(iconName) {
+  try {
+    return new URL(`../../../assets/vehicle/${iconName}.svg`, import.meta.url).href;
+  } catch (e) {
+    // return new URL(`../../../assets/icons/default.svg`, import.meta.url).href;
+  }
+}
+function getUnitColor(row) {
+  if (row.licenseExpired) return "red";
+  if (row.outdated) return "orange";
+  return "blue";
+}
 
 </script>

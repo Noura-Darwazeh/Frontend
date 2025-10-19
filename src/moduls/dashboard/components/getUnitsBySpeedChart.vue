@@ -8,7 +8,9 @@ import { CanvasRenderer } from "echarts/renderers";
 import chartHeader from "./chartHeader.vue";
 import { getVehiclesGroupedBySpeed } from "../stores/getSpeedSummary"
 import refreshIcon from "../../../assets/chart/refresh.svg"; // استيراد الأيقونة
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 use([PieChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 
@@ -79,7 +81,7 @@ onMounted(() => {
 
 <template>
     <div class="chart">
-        <chartHeader title="Speed Summary" :icon="refreshIcon" />
+        <chartHeader :title="t('charts.speed-summary')" :icon="refreshIcon" />
         <VChart :option="chartOptions" autoresize class="chart-box" />
     </div>
 </template>

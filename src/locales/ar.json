@@ -1,0 +1,122 @@
+{
+    "header": {
+        "titles": {
+            "dashboard": "لوحة التحكم",
+            "units": "وحدات التتبع"
+        }
+    },
+    "user": {
+        "name": "عامر أمين",
+        "email": "ameramin08@gmail.com",
+        "editProfile": "تعديل الملف الشخصي",
+        "switchAccount": "تبديل الحساب",
+        "logout": "تسجيل الخروج"
+    },
+    "buttons": {
+        "export": "تصدير",
+        "sort": "فرز",
+        "deletedItems": "العناصر المحذوفة",
+        "addUnit": "إضافة وحدة",
+        "refresh": "تحديث",
+        "group": "المجموعات"
+    },
+    "filters": {
+        "allUnits": "كل الوحدات"
+    },
+    "sidebar": {
+        "dashboard": "لوحة التحكم",
+        "units": "وحدات التتبع",
+        "drivers": "السائقون",
+        "map": "الخريطة",
+        "areas": "المناطق",
+        "customers": "الزبائن",
+        "devices-and-providers": "الاجهزة والمزودون",
+        "maintenance": "الصيانة",
+        "notification": "الاشعارات"
+    },
+    "placeholders": {
+        "search": "بحث"
+    },
+    "common": {
+        "add": "إضافة",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "close": "إغلاق"
+    },
+    "unitModal": {
+        "header": { "add": "إضافة وحدة جديدة", "edit": "تعديل الوحدة" },
+        "fields": {
+            "unitName": "اسم الوحدة",
+            "fuelType": "نوع الوقود",
+            "unitIcon": "أيقونة الوحدة",
+            "tankCapacity": "سعة الخزان",
+            "unitModel": "موديل الوحدة",
+            "engineSerial": "رقم محرك السيارة",
+            "chassisSerial": "رقم شاسيه السيارة",
+            "oilConsumption": "استهلاك الوقود (لتر/كم)",
+            "vehicleColor": "لون المركبة",
+            "licenseExpiry": "تاريخ انتهاء الرخصة",
+            "insuranceExpiry": "تاريخ انتهاء التأمين",
+            "tags": "الوسوم"
+        },
+        "placeholders": {
+            "unitName": "مثال: كيا سورينتو",
+            "tankCapacity": "300",
+            "engineSerial": "مثال: 498 - 02358",
+            "chassisSerial": "مثال: 1HGBH41JXMN109186",
+            "oilConsumption": "مثال: 60",
+            "tags": "ابحث عن الوسوم"
+        },
+        "fuelTypes": { "petrol": "بنزين", "diesel": "ديزل" }
+    },
+    "unitDetails": {
+        "title": "تفاصيل الوحدة",
+        "status": { "notSynced": "غير متزامن" },
+        "lastSynced": "آخر مزامنة {time}",
+        "tabs": { "info": "المعلومات", "devices": "الأجهزة", "drivers": "السائقون" },
+        "fields": {
+            "vehicleName": "اسم المركبة",
+            "fuelType": "نوع الوقود",
+            "tankCapacity": "سعة الخزان",
+            "vehicleModel": "موديل المركبة",
+            "chassisSerial": "رقم الشاسيه",
+            "engineSerial": "رقم المحرك",
+            "oilConsumption": "استهلاك الوقود (لتر/كم)",
+            "licenseExpiry": "انتهاء الرخصة",
+            "insuranceExpiry": "انتهاء التأمين",
+            "vehicleColor": "لون المركبة",
+            "vehicleIcon": "أيقونة المركبة",
+            "tags": "الوسوم"
+        },
+        "noDevices": "لا توجد أجهزة.",
+        "driverHistory": "سجل السائق",
+        "fullReport": "تقرير كامل",
+        "unitProfile": "ملف الوحدة"
+    },
+    "columns": {
+    "id": "رقم",
+    "unit": "الوحدة",
+    "driver": "السائق",
+    "phone": "الهاتف",
+    "color": "اللون",
+    "model": "الموديل",
+    "lastUpdate": "آخر تحديث",
+    "icon": "أيقونة",
+    "state": "الحالة",
+    "devices": "الأجهزة",
+    "sim": "SIM",
+      "actions": "الإجراءات",
+      "insuranceExpiry": "انتهاء التأمين",
+      "licenseExpiry": "انتهاء الترخيص",
+      "trackingName": "اسم التتبع",
+      "location": "الموقع",
+      "tracking": "التتبع"
+  },
+    "charts":{
+        "activity-summary":"ملخص الانشطة",
+        "speed-summary":"ملخص السرعة",
+        "top-5-speed":"اعلى 5 سرعات",
+        "total-vehicles":"مجموع المركبات",
+        "speed":"السرعة"
+    }
+}

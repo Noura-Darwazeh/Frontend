@@ -9,7 +9,7 @@
 
           <th v-for="col in columns" :key="col.key">
             <div class="th-with-icon">
-              <span>{{ col.label }}</span>
+              <span>{{ col.key !== 'actions' ? $t('columns.' + col.key) : '' }}</span>
               <img
                 v-if="col.icon"
                 :src="ChevronIcon"

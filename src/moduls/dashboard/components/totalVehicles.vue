@@ -1,12 +1,14 @@
 <script setup>
 import chartHeader from "./chartHeader.vue";
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <template>
     <div class="chart">
-        <chartHeader title="Total Vehicles" />
+        <chartHeader :title="t('charts.total-vehicles')" />
         <p>95</p>
-        <!-- <v-chart :option="option" autoresize class="chart-box" /> -->
         <img src="../../../assets/chart/image.svg" width="230" height="126">
     </div>
 </template>
@@ -20,7 +22,6 @@ import chartHeader from "./chartHeader.vue";
     height: 350px;
     border: 1px solid #d7dee4;
     border-radius: 8px;
-    /* padding: 10px; */
     display: flex;
     flex-direction: column;
     justify-content: start;

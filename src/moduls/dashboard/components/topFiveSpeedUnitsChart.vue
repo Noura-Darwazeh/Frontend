@@ -11,8 +11,10 @@ import { BarChart } from "echarts/charts";
 import { CanvasRenderer } from "echarts/renderers";
 import { getTop5SpeedUnits } from '../stores/fiveSpeedUnits';
 import chartHeader from "./chartHeader.vue";
-import refreshIcon from "../../../assets/chart/refresh.svg"; // استيراد الأيقونة
+import refreshIcon from "../../../assets/chart/refresh.svg";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 use([TitleComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer]);
 
 const option = ref({
@@ -74,7 +76,7 @@ onMounted(async () => {
 
 <template>
     <div class="chart">
-        <chartHeader title="Top 5 Speeding" :icon="refreshIcon" />
+        <chartHeader :title="t('charts.top-5-speed')" :icon="refreshIcon" />
         <v-chart :option="option" autoresize class="chart-box" />
     </div>
 </template>

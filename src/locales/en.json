@@ -1,0 +1,122 @@
+{
+    "header": {
+        "titles": {
+            "dashboard": "Dashboard",
+            "units": "Units"
+        }
+    },
+    "user": {
+        "name": "Amer Amin",
+        "email": "ameramin08@gmail.com",
+        "editProfile": "Edit Profile",
+        "switchAccount": "Switch account",
+        "logout": "Log Out"
+    },
+    "buttons": {
+        "export": "Export",
+        "sort": "Sort",
+        "deletedItems": "Deleted Items",
+        "addUnit": "Add Unit",
+        "refresh": "Refresh",
+        "group": "Group"
+    },
+    "filters": {
+        "allUnits": "All Units"
+    },
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "units": "Units",
+        "drivers": "Driver",
+        "map": "Map",
+        "areas": "Areas",
+        "customers": "Customers",
+        "devices-and-providers": "Devices and Providers",
+        "maintenance": "Maintenance",
+        "notification": "Notification Settings"
+    },
+    "placeholders": {
+        "search": "Search"
+    },
+    "common": {
+        "add": "Add",
+        "save": "Save",
+        "cancel": "Cancel",
+        "close": "Close"
+    },
+    "unitModal": {
+        "header": { "add": "Add New Unit", "edit": "Edit Unit" },
+        "fields": {
+            "unitName": "Unit Name",
+            "fuelType": "Fuel Type",
+            "unitIcon": "Unit Icon",
+            "tankCapacity": "Tank Capacity",
+            "unitModel": "Unit Model",
+            "engineSerial": "Engine Serial Number",
+            "chassisSerial": "Chassis Serial Number",
+            "oilConsumption": "Oil Consumption(liter/Km)",
+            "vehicleColor": "Vehicle Color",
+            "licenseExpiry": "License Expiry At",
+            "insuranceExpiry": "Insurance Expiry At",
+            "tags": "Tags"
+        },
+        "placeholders": {
+            "unitName": "E.g Kia Sorento",
+            "tankCapacity": "300",
+            "engineSerial": "E.g 498 - 02358",
+            "chassisSerial": "E.g 1HGBH41JXMN109186",
+            "oilConsumption": "E.g 60",
+            "tags": "Search for tags"
+        },
+        "fuelTypes": { "petrol": "Petrol", "diesel": "Diesel" }
+    },
+    "unitDetails": {
+        "title": "Unit Details",
+        "status": { "notSynced": "Not Synced" },
+        "lastSynced": "Last Synced {time}",
+        "tabs": { "info": "Info", "devices": "Devices", "drivers": "Drivers" },
+        "fields": {
+            "vehicleName": "Vehicle Name",
+            "fuelType": "Fuel Type",
+            "tankCapacity": "Tank Capacity",
+            "vehicleModel": "Vehicle Model",
+            "chassisSerial": "Chassis Serial Number",
+            "engineSerial": "Engine Serial Number",
+            "oilConsumption": "Oil Consumption(liter/Km)",
+            "licenseExpiry": "License Expiry At",
+            "insuranceExpiry": "Insurance Expiry At",
+            "vehicleColor": "Vehicle Color",
+            "vehicleIcon": "Vehicle Icon",
+            "tags": "Tags"
+        },
+        "noDevices": "No devices found.",
+        "driverHistory": "DRIVER HISTORY",
+        "fullReport": "Full Report",
+        "unitProfile": "Unit Profile"
+    },
+    "columns": {
+        "id": "ID",
+        "unit": "Unit",
+        "driver": "Driver",
+        "phone": "Phone",
+        "color": "Color",
+        "model": "Model",
+        "lastUpdate": "Last Update",
+        "icon": "Icon",
+        "state": "State",
+        "devices": "Devices",
+        "sim": "SIM",
+        "actions": "Actions",
+        "insuranceExpiry": "Insurance expiry",
+        "licenseExpiry": "License expiry",
+        "trackingName": "Tracking Name",
+        "location": "Location",
+        "tracking": "Tracking"
+    },
+    "charts": {
+        "activity-summary": "Activity Summary",
+        "speed-summary": "Speed Summary",
+        "top-5-speed": "Top 5 Speeding",
+        "total-vehicles": "Total Vehicles",
+        "speed": "Speed Summary"
+    }
+}

@@ -2,7 +2,7 @@
     <div class="dropdown text-end" ref="dropdown" style="z-index: 1000;">
         <div class="select-box" @click="toggleDropdown">
             <span>
-                Amer Amin
+                {{ $t('user.name') }}
             </span>
             <img src="../../assets/arrow.svg" alt="arrow" class="arrow" />
         </div>
@@ -21,22 +21,22 @@
                 <div class="profile-box">
                     <img :src="profileImage" alt="profile" width="70" height="70" class="rounded-circle mb-2" />
                     <div>
-                        <strong>{{ name }}</strong><br />
-                        <small class="text-muted">{{ email }}</small>
+                        <strong>{{ $t('user.name') }}</strong><br />
+                        <small class="text-muted">{{ $t('user.email') }}</small>
                     </div>
-                    <Btn label="Edit Profile" @click.prevent="editProfile" />
+                    <Btn :label="$t('user.editProfile')" @click.prevent="editProfile" />
                 </div>
             </li>
 
             <li>
                 <a class="dropdown-item" href="#" @click.prevent="switchAccount">
-                    Switch account
+                    {{ $t('user.switchAccount') }}
                 </a>
             </li>
 
             <li>
                 <a class="dropdown-item" href="#" @click.prevent="logout">
-                    Log Out
+                    {{ $t('user.logout') }}
                 </a>
             </li>
         </ul>

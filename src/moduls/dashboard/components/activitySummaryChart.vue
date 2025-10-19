@@ -7,8 +7,10 @@ import { TooltipComponent, LegendComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import chartHeader from "./chartHeader.vue";
 import { getVehiclesGroupedByStatus } from "../stores/getActivitySummary";
-import refreshIcon from "../../../assets/chart/refresh.svg"; // استيراد الأيقونة
+import refreshIcon from "../../../assets/chart/refresh.svg";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 use([PieChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 const chartOptions = ref({
@@ -78,7 +80,7 @@ onMounted(() => {
 
 <template>
     <div class="chart">
-        <chartHeader title="Activity Summary" :icon="refreshIcon" />
+        <chartHeader :title="t('charts.activity-summary')" :icon="refreshIcon" />
         <VChart :option="chartOptions" autoresize class="chart-box" />
     </div>
 </template>

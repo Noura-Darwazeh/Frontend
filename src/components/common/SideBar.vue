@@ -15,7 +15,7 @@
           <li :class="{ active: activeItem === 'dashboard' }">
             <router-link :to="{ name: 'dashboard' }" @click.native="setActive('dashboard')">
               <img class="icon" src="../../assets/dashboard.svg" alt="" />
-              <span v-if="!isCollapsed">Dashboard</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.dashboard') }}</span>
             </router-link>
 
           </li>
@@ -23,50 +23,50 @@
             <!-- <a href="#" @click.prevent="setActive('units')"> -->
             <router-link :to="{ name: 'units' }" @click.native="setActive('units')">
               <img class="icon" src="../../assets/units.svg" alt="" />
-              <span v-if="!isCollapsed">Units</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.units') }}</span>
               <!-- </a> -->
             </router-link>
           </li>
           <li :class="{ active: activeItem === 'drivers' }">
             <a href="#" @click.prevent="setActive('drivers')">
               <img class="icon" src="../../assets/drivers.svg" alt="" />
-              <span v-if="!isCollapsed">Drivers</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.drivers') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'map' }">
             <a href="#" @click.prevent="setActive('map')">
               <img class="icon" src="../../assets/map.svg" alt="" />
-              <span v-if="!isCollapsed">Map</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.map') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'areas' }">
             <a href="#" @click.prevent="setActive('areas')">
               <img class="icon" src="../../assets/areas.svg" alt="" />
-              <span v-if="!isCollapsed">Areas</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.areas') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'customers' }">
             <a href="#" @click.prevent="setActive('customers')">
               <img class="icon" src="../../assets/Customers.svg" alt="" />
-              <span v-if="!isCollapsed">Customers</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.customers') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'devices' }">
             <a href="#" @click.prevent="setActive('devices')">
               <img class="icon" src="../../assets/Devices and Providers.svg" alt="" />
-              <span v-if="!isCollapsed">Devices and Providers</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.devices-and-providers') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'maintenance' }">
             <a href="#" @click.prevent="setActive('maintenance')">
               <img class="icon" src="../../assets/Maintenance.svg" alt="" />
-              <span v-if="!isCollapsed">Maintenance</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.maintenance') }}</span>
             </a>
           </li>
           <li :class="{ active: activeItem === 'notifications' }">
             <a href="#" @click.prevent="setActive('notifications')">
               <img class="icon" src="../../assets/Notification Settings.svg" alt="" />
-              <span v-if="!isCollapsed">Notification Settings</span>
+              <span v-if="!isCollapsed">{{ $t('sidebar.notification') }}</span>
             </a>
           </li>
         </ul>
