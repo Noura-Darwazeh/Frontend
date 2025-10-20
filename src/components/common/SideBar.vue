@@ -20,13 +20,19 @@
 
           </li>
           <li :class="{ active: activeItem === 'units' }">
-            <!-- <a href="#" @click.prevent="setActive('units')"> -->
             <router-link :to="{ name: 'units' }" @click.native="setActive('units')">
               <img class="icon" src="../../assets/units.svg" alt="" />
               <span v-if="!isCollapsed">{{ $t('sidebar.units') }}</span>
-              <!-- </a> -->
             </router-link>
           </li>
+
+          <li :class="{ active: activeItem === 'tags' }">
+            <router-link :to="{ name: 'tags' }" @click.native="setActive('tags')">
+              <img class="icon" src="../../assets/units.svg" alt="" />
+              <span v-if="!isCollapsed">{{ $t('sidebar.tags') }}</span>
+            </router-link>
+          </li>
+
           <li :class="{ active: activeItem === 'drivers' }">
             <a href="#" @click.prevent="setActive('drivers')">
               <img class="icon" src="../../assets/drivers.svg" alt="" />

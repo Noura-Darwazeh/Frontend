@@ -2,7 +2,9 @@
     "header": {
         "titles": {
             "dashboard": "Dashboard",
-            "units": "Units"
+            "units": "Units",
+            "tags":"Tags",
+            "addtags":"Add Tag"
         }
     },
     "user": {
@@ -17,6 +19,7 @@
         "sort": "Sort",
         "deletedItems": "Deleted Items",
         "addUnit": "Add Unit",
+        "addTag":"Add Tag",
         "refresh": "Refresh",
         "group": "Group"
     },
@@ -26,6 +29,7 @@
     "sidebar": {
         "dashboard": "Dashboard",
         "units": "Units",
+        "tags":"Tags",
         "drivers": "Driver",
         "map": "Map",
         "areas": "Areas",
