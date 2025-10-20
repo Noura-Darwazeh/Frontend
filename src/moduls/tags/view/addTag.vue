@@ -89,116 +89,111 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-// import { getUnitsDroplist, getDriversDroplist } from '../stores/tags'
-import api, { getUnitsDroplist, getDriversDroplist, addTag } from '../stores/tags'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getUnitsDroplist, getDriversDroplist, addTag, getTagById, updateTag } from '../stores/tags'
 
-// ======================
-// 🔹 Tag Name
-// ======================
+const route = useRoute();
+const router = useRouter();
+const tagId = route.query.editId || null;
+
+// Tag Name
 const tagName = ref('')
 const error = ref('')
 
-// ======================
-// 🔹 Units Section
-// ======================
+// Units Section
 const units = ref([])
 const unitSearch = ref('')
 const isUnitsOpen = ref(true)
 
+// Drivers Section
 const drivers = ref([])
 const driverSearch = ref('')
 const isDriversOpen = ref(true)
 
-// Fetch units
-onMounted(async () => {
+// Fetch Units & Drivers
+const fetchUnitsAndDrivers = async () => {
   try {
-    const res = await getUnitsDroplist()
-    if (res.status === 'success' && Array.isArray(res.result)) {
-      units.value = res.result.map(item => ({
-        id: item.id,
-        name: item.name,
-        selected: false,
-      }))
-    }
-  } catch (err) {
-    console.error('Failed to fetch units:', err)
-  }
+    const [resUnits, resDrivers] = await Promise.all([getUnitsDroplist(), getDriversDroplist()])
 
-  // Fetch drivers too (same mount)
-  try {
-    const resDrivers = await getDriversDroplist()
-    console.log(' Drivers Response:', resDrivers)
+    if (resUnits.status === 'success' && Array.isArray(resUnits.result)) {
+      units.value = resUnits.result.map(u => ({ id: u.id, name: u.name, selected: false }))
+    }
 
     if (resDrivers.status === 'success' && Array.isArray(resDrivers.result.data)) {
-      drivers.value = resDrivers.result.data.map(item => ({
-        id: item.id,
-        name: item.name,
-        selected: false,
-      }))
+      drivers.value = resDrivers.result.data.map(d => ({ id: d.id, name: d.name, selected: false }))
+    }
+
+  } catch (err) {
+    console.error('Failed to fetch units or drivers:', err)
+  }
+}
+
+// Load Tag for Edit
+const loadTagData = async (id) => {
+  try {
+    const res = await getTagById(id)
+    if (res?.result) {
+      const tag = res.result
+      console.log("info edit:", tag)
+      tagName.value = tag.name
+
+      units.value.forEach(u => {
+        u.selected = tag.vehicles.map(v => String(v)).includes(String(u.id))
+      })
+      drivers.value.forEach(d => {
+        d.selected = tag.drivers.map(x => String(x)).includes(String(d.id))
+      })
+
+      await nextTick()
     }
   } catch (err) {
-    console.error('Failed to fetch drivers:', err)
+    console.error('Failed to load tag for edit:', err)
+  }
+}
+
+// Mounted
+onMounted(async () => {
+  await fetchUnitsAndDrivers()
+   if (tagId) {
+    await loadTagData(tagId)
+    router.currentRoute.value.meta.title = 'Edit Tag'
+  } else {
+    router.currentRoute.value.meta.title = 'Add Tag'
   }
 })
 
-// Computed for units
-const selectedUnits = computed(() => units.value.filter(v => v.selected))
-const unselectedUnits = computed(() => units.value.filter(v => !v.selected))
-
-const filteredSelectedUnits = computed(() =>
-  selectedUnits.value.filter(v =>
-    v.name.toLowerCase().includes(unitSearch.value.toLowerCase())
-  )
-)
-const filteredUnselectedUnits = computed(() =>
-  unselectedUnits.value.filter(v =>
-    v.name.toLowerCase().includes(unitSearch.value.toLowerCase())
-  )
-)
-const allUnitsSelected = computed(() => units.value.length > 0 && units.value.every(v => v.selected))
-
+// Computed
+const selectedUnits = computed(() => units.value.filter(u => u.selected))
+const unselectedUnits = computed(() => units.value.filter(u => !u.selected))
+const filteredSelectedUnits = computed(() => selectedUnits.value.filter(u => u.name.toLowerCase().includes(unitSearch.value.toLowerCase())))
+const filteredUnselectedUnits = computed(() => unselectedUnits.value.filter(u => u.name.toLowerCase().includes(unitSearch.value.toLowerCase())))
+const allUnitsSelected = computed(() => units.value.length > 0 && units.value.every(u => u.selected))
 const toggleSelectAllUnits = () => {
   const newValue = !allUnitsSelected.value
-  units.value.forEach(v => (v.selected = newValue))
+  units.value.forEach(u => u.selected = newValue)
 }
 
-// ======================
-// 🔹 Drivers Section
-// ======================
-
-
-const selectedDrivers = computed(() => drivers.value.filter(v => v.selected))
-const unselectedDrivers = computed(() => drivers.value.filter(v => !v.selected))
-
-const filteredSelectedDrivers = computed(() =>
-  selectedDrivers.value.filter(v =>
-    v.name.toLowerCase().includes(driverSearch.value.toLowerCase())
-  )
-)
-const filteredUnselectedDrivers = computed(() =>
-  unselectedDrivers.value.filter(v =>
-    v.name.toLowerCase().includes(driverSearch.value.toLowerCase())
-  )
-)
-const allDriversSelected = computed(() => drivers.value.length > 0 && drivers.value.every(v => v.selected))
-
+const selectedDrivers = computed(() => drivers.value.filter(d => d.selected))
+const unselectedDrivers = computed(() => drivers.value.filter(d => !d.selected))
+const filteredSelectedDrivers = computed(() => selectedDrivers.value.filter(d => d.name.toLowerCase().includes(driverSearch.value.toLowerCase())))
+const filteredUnselectedDrivers = computed(() => unselectedDrivers.value.filter(d => d.name.toLowerCase().includes(driverSearch.value.toLowerCase())))
+const allDriversSelected = computed(() => drivers.value.length > 0 && drivers.value.every(d => d.selected))
 const toggleSelectAllDrivers = () => {
   const newValue = !allDriversSelected.value
-  drivers.value.forEach(v => (v.selected = newValue))
+  drivers.value.forEach(d => d.selected = newValue)
 }
+const pageTitle = computed(() => {
+  return tagId ? 'Edit Tag' : 'Add Tag';
+});
 
-// ======================
-// 🔹 Toggle Sections
-// ======================
-const toggleSection = section => {
+// Toggle Sections
+const toggleSection = (section) => {
   if (section === 'units') isUnitsOpen.value = !isUnitsOpen.value
   else if (section === 'drivers') isDriversOpen.value = !isDriversOpen.value
 }
 
-// ======================
-// 🔹 Save Tag
-// ======================
+// Save Tag
 const saveTag = async () => {
   if (!tagName.value.trim()) {
     error.value = 'Tag Name is required'
@@ -206,25 +201,28 @@ const saveTag = async () => {
   }
   error.value = ''
 
-  // Prepare payload
   const payload = {
     name: tagName.value,
-    vehicles: selectedUnits.value.map(v => v.id),   // array of selected unit ids
-    drivers: selectedDrivers.value.map(d => d.id),  // array of selected driver ids
+    vehicles: selectedUnits.value.map(u => u.id),
+    drivers: selectedDrivers.value.map(d => d.id)
   }
 
- try {
-    // استخدم الدالة من ملف tags
-    const response = await addTag(payload)
-    console.log('Tag saved:', response)
-    alert('Tag saved successfully!')
-    window.location.href = '/tags' // redirect
+  try {
+    if (tagId) {
+      await updateTag(tagId, payload)
+      alert('Tag updated successfully!')
+    } else {
+      await addTag(payload)
+      alert('Tag added successfully!')
+    }
+    router.push({ name: 'tags' })
   } catch (err) {
     console.error('Failed to save tag:', err)
     alert('Failed to save tag. Please try again.')
   }
 }
 </script>
+
 
 <style scoped>
 .add-tag-page {

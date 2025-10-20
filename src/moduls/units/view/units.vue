@@ -99,8 +99,6 @@ onMounted(async () => {
   });
 });
 
-
-
 function handleColumnsUpdate(updatedColumns) {
   unitsCols.value = updatedColumns;
 }

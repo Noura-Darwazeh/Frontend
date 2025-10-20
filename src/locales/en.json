@@ -4,7 +4,8 @@
             "dashboard": "Dashboard",
             "units": "Units",
             "tags":"Tags",
-            "addtags":"Add Tag"
+            "addtags":"Add Tag",
+            "edittag": "Edit Tag"
         }
     },
     "user": {

@@ -15,19 +15,19 @@ const routes = [
         path: '/units',
         name: 'units',
         component: Units,
-        meta: { requiresAuth: true,title: 'Units' }
+        meta: { requiresAuth: true, title: 'Units' }
     },
-        {
+    {
         path: '/tags',
         name: 'tags',
         component: Tags,
-        meta: { requiresAuth: true,title: 'Tags' }
+        meta: { requiresAuth: true, title: 'Tags' }
     },
-            {
+    {
         path: '/add-tags',
         name: 'addtags',
         component: Addtags,
-        meta: { requiresAuth: true,title: 'Addtags' }
+        meta: { requiresAuth: true, title: 'Addtags' }
     },
 
     {
@@ -50,17 +50,17 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  if (to.meta.requiresAuth && !token) {
-    return next({ name: "login" });
-  }
+    if (to.meta.requiresAuth && !token) {
+        return next({ name: "login" });
+    }
 
-  if (token && to.name === "login") {
-    return next({ name: "units" });
-  }
+    if (token && to.name === "login") {
+        return next({ name: "units" });
+    }
 
-  return next();
+    return next();
 });
 
 export default router

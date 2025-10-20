@@ -14,7 +14,7 @@ const route = useRoute();
   <div v-else class="containerApp">
     <SideBar />
     <div class="RightContent">
-      <MainHeader :title="route.meta.title" />
+      <MainHeader :title="route.meta.title || pageTitle" />
       <router-view />
     </div>
   </div>

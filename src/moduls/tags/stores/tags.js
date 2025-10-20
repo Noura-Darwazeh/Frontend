@@ -64,5 +64,38 @@ export const getDriversDroplist = async () => {
         throw error
     }
 }
+
+export const getTagById = async (id) => {
+  try {
+    console.log('API: Fetching tag with ID:', id);
+    const response = await api.get(`/tags/${id}`);
+    console.log('API: Tag response:', response.data);
+    return response.data;
+  } catch (err) {
+    console.error('API: Error fetching tag by ID:', err);
+    console.error('API: Error response:', err.response?.data);
+    throw err;
+  }
+};
+
+export const updateTag = async (id, payload) => {
+  try {
+    const response = await api.put(`/tags/${id}`, payload);
+    return response.data;
+  } catch (err) {
+    console.error('Error updating tag:', err);
+    throw err;
+  }
+};
+export const deleteTag = async (id) => {
+  try {
+    const response = await api.delete(`/tags/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error('Error deleting tag:', err);
+    throw err;
+  }
+};
+
 export default api;
 
