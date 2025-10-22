@@ -20,6 +20,7 @@ export default {
   name: "MultiSelect",
   props: {
     rowData: { type: Object, required: true },
+    showDetails: { type: Boolean, default: true } // 👈 هنا الإضافة
   },
   data() {
     return {
@@ -28,6 +29,19 @@ export default {
       optionIcons: [infoCircle, pencil, trash],
       activeOption: null,
     };
+  },
+    computed: {
+    options() {
+      // 👇 لو showDetails = false نحذف أول خيار
+      return this.showDetails
+        ? ["Unit details", "Edit", "Delete"]
+        : ["Edit", "Delete"];
+    },
+    optionIcons() {
+      return this.showDetails
+        ? [infoCircle, pencil, trash]
+        : [pencil, trash];
+    },
   },
   methods: {
     toggleDropdown() {

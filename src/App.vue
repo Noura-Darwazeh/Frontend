@@ -4,6 +4,9 @@ import { useRoute } from 'vue-router';
 import SideBar from './components/common/SideBar.vue'
 import MainHeader from './components/common/Header.vue'
 const route = useRoute();
+import { ref } from 'vue'
+const dynamicTitle = ref('')
+
 </script>
 
 <template>
@@ -16,6 +19,7 @@ const route = useRoute();
     <div class="RightContent">
       <MainHeader :title="route.meta.title || pageTitle" />
       <router-view />
+
     </div>
   </div>
 </template>

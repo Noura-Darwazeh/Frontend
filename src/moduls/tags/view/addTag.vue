@@ -89,13 +89,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getUnitsDroplist, getDriversDroplist, addTag, getTagById, updateTag } from '../stores/tags'
 
 const route = useRoute();
 const router = useRouter();
-const tagId = route.query.editId || null;
+
+// make editId reactive so component reacts when query changes
+const tagId = computed(() => route.query.editId || null)
 
 // Tag Name
 const tagName = ref('')
@@ -110,6 +112,24 @@ const isUnitsOpen = ref(true)
 const drivers = ref([])
 const driverSearch = ref('')
 const isDriversOpen = ref(true)
+
+// Helper to set document title and route meta and dispatch an event for parent header
+const setTitle = (title) => {
+  // update document title
+  document.title = title
+
+  // try to update current route meta (useful if header reads route.meta.title)
+  if (router && router.currentRoute && router.currentRoute.value) {
+    router.currentRoute.value.meta = { ...router.currentRoute.value.meta, title }
+  }
+
+  // dispatch event in case parent layout listens to it to update its header
+  try {
+    window.dispatchEvent(new CustomEvent('update-header-title', { detail: title }))
+  } catch (e) {
+    // ignore
+  }
+}
 
 // Fetch Units & Drivers
 const fetchUnitsAndDrivers = async () => {
@@ -136,14 +156,17 @@ const loadTagData = async (id) => {
     if (res?.result) {
       const tag = res.result
       console.log("info edit:", tag)
-      tagName.value = tag.name
+      tagName.value = tag.name || ''
 
       units.value.forEach(u => {
-        u.selected = tag.vehicles.map(v => String(v)).includes(String(u.id))
+        u.selected = (tag.vehicles || []).map(v => String(v)).includes(String(u.id))
       })
       drivers.value.forEach(d => {
-        d.selected = tag.drivers.map(x => String(x)).includes(String(d.id))
+        d.selected = (tag.drivers || []).map(x => String(x)).includes(String(d.id))
       })
+
+      // set title with tag name for clarity
+      setTitle(`Edit Tag - ${tag.name || 'Untitled'}`)
 
       await nextTick()
     }
@@ -155,11 +178,33 @@ const loadTagData = async (id) => {
 // Mounted
 onMounted(async () => {
   await fetchUnitsAndDrivers()
-   if (tagId) {
-    await loadTagData(tagId)
-    router.currentRoute.value.meta.title = 'Edit Tag'
+  if (tagId.value) {
+    await loadTagData(tagId.value)
   } else {
-    router.currentRoute.value.meta.title = 'Add Tag'
+    setTitle('Add Tag')
+  }
+})
+
+// Update title when tagName changes while editing
+watch(tagName, (newVal) => {
+  if (tagId.value) {
+    setTitle(`Edit Tag - ${newVal || 'Untitled'}`)
+  }
+})
+
+// Watch route changes (react to query change)
+watch(() => route.fullPath, async () => {
+  const newEditId = route.query.editId || null
+  if (newEditId) {
+    // reload data for new id
+    await fetchUnitsAndDrivers()
+    await loadTagData(newEditId)
+  } else {
+    // switched to add
+    tagName.value = ''
+    units.value.forEach(u => u.selected = false)
+    drivers.value.forEach(d => d.selected = false)
+    setTitle('Add Tag')
   }
 })
 
@@ -183,9 +228,18 @@ const toggleSelectAllDrivers = () => {
   const newValue = !allDriversSelected.value
   drivers.value.forEach(d => d.selected = newValue)
 }
+
 const pageTitle = computed(() => {
-  return tagId ? 'Edit Tag' : 'Add Tag';
+  return tagId.value ? 'Edit Tag' : 'Add Tag';
 });
+
+// combine page title with the tag name for visible header inside this component
+const pageTitleWithName = computed(() => {
+  if (tagId.value) {
+    return `Edit Tag${tagName.value ? ' - ' + tagName.value : ''}`
+  }
+  return 'Add Tag'
+})
 
 // Toggle Sections
 const toggleSection = (section) => {
@@ -208,8 +262,8 @@ const saveTag = async () => {
   }
 
   try {
-    if (tagId) {
-      await updateTag(tagId, payload)
+    if (tagId.value) {
+      await updateTag(tagId.value, payload)
       alert('Tag updated successfully!')
     } else {
       await addTag(payload)

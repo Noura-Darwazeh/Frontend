@@ -12,7 +12,7 @@
       </template>
 
       <template #cell-actions="{ row }">
-        <MultiSelect :row-data="row" @show-details="openUnitDetailsModal" @edit="openEditModal" @delete="deleteUnit" />
+        <MultiSelect :row-data="row"  :show-details="true" @show-details="openUnitDetailsModal" @edit="openEditModal" @delete="deleteUnit" />
       </template>
 
       <template #cell-icon="{ value }">
