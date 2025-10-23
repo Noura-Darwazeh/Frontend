@@ -4,6 +4,8 @@ import Login from '../moduls/login/view/login.vue'
 import Dashboard from '../moduls/dashboard/view/dashboard.vue'
 import Tags from "../moduls/tags/view/tags.vue"
 import Addtags from "../moduls/tags/view/addTag.vue"
+import Map from "../moduls/map/view/map.vue"
+
 const routes = [
     {
         path: '/',
@@ -41,6 +43,12 @@ const routes = [
         name: 'dashboard',
         component: Dashboard,
         meta: { requiresAuth: true, title: 'Dashboard' }
+    },
+    {
+        path: '/map',
+        name: 'map',
+        component: Map,
+        meta: { requiresAuth: true, title: 'Map' }
     },
 ]
 

@@ -40,10 +40,10 @@
             </a>
           </li>
           <li :class="{ active: activeItem === 'map' }">
-            <a href="#" @click.prevent="setActive('map')">
+            <router-link :to="{ name: 'map' }" @click.native="setActive('map')">
               <img class="icon" src="../../assets/map.svg" alt="" />
               <span v-if="!isCollapsed">{{ $t('sidebar.map') }}</span>
-            </a>
+            </router-link>
           </li>
           <li :class="{ active: activeItem === 'areas' }">
             <a href="#" @click.prevent="setActive('areas')">
