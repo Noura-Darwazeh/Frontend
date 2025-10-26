@@ -45,14 +45,16 @@ export const postArea = async(payload) => {
         throw error;
     }
 }
+// delete area
+export const deleteArea = async (id) => {
+  try {
+    const response = await api.delete(`/zones/${id}`)
+    return response.data
+  } catch (error) {
+    console.error('Error deleting area:', error)
+    throw error
+  }
+}
 
-// export const addTag = async (payload) => {
-//     try {
-//         const response = await api.post('/tags', payload)
-//         return response.data
-//     } catch (error) {
-//         console.error('Error adding tag:', error);
-//         throw error;
-//     }}
 export default api;
 
