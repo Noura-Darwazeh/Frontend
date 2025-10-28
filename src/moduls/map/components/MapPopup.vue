@@ -7,7 +7,7 @@
       <input v-model="localName" placeholder="Enter area name" />
 
       <label>Description</label>
-      <textarea v-model="localDescription" placeholder="Optional description"></textarea>
+      <textarea v-model="localDescription" placeholder="Enter description"></textarea>
 
       <div class="popup-buttons">
         <button @click="$emit('save')">Save</button>
