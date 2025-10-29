@@ -1,7 +1,15 @@
 <template>
   <div class="map-page">
-    <div ref="mapContainer" class="map-container"></div>
+    <div class="search-bar">
+      <input v-model="searchTerm" @input="handleSearch" list="areas-list" placeholder="🔍 Search area..."
+        class="search-input" />
 
+      <datalist id="areas-list">
+        <option v-for="name in areaNames" :key="name" :value="name" />
+      </datalist>
+    </div>
+
+    <div ref="mapContainer" class="map-container"></div>
     <div class="floating-button" @click="showDropdown = !showDropdown">
       ➕
       <ul v-if="showDropdown" class="drawing-options">
@@ -12,14 +20,8 @@
     </div>
 
     <div class="clear-button" @click="clearAllAreas">🗑️ Clear All</div>
-
-    <MapPopup
-      v-if="showPopup"
-      v-model:areaName="areaName"
-      v-model:areaDescription="areaDescription"
-      @save="saveArea"
-      @cancel="cancelArea"
-    />
+    <MapPopup v-if="showPopup" v-model:areaName="areaName" v-model:areaDescription="areaDescription" @save="saveArea"
+      @cancel="cancelArea" />
 
     <div ref="tooltip" class="map-tooltip" v-show="tooltipVisible">
       {{ tooltipText }}
@@ -38,7 +40,9 @@ const showDropdown = ref(false);
 const showPopup = ref(false);
 const areaName = ref('');
 const areaDescription = ref('');
-
+const searchTerm = ref('');
+//search
+const areaNames = ref([]);
 const shapes = ['Point', 'Polygon', 'Box', 'Square', 'Circle'];
 
 const {
@@ -51,16 +55,38 @@ const {
   mapInstance,
   tooltipVisible,
   tooltipText,
+  focusOnAreaByName,
+  //search
+  getAllAreaNames,
 } = useMap({ mapContainer, tooltip, showPopup, areaName, areaDescription });
 
-onMounted(() => {
+onMounted(async () => {
   initMap();
-  fetchZones();
+  await fetchZones();
+  areaNames.value = getAllAreaNames(); 
 });
+
 
 onBeforeUnmount(() => {
   if (mapInstance.value) mapInstance.value.setTarget(null);
 });
+
+let searchTimeout = null;
+
+function handleSearch() {
+  clearTimeout(searchTimeout);
+
+  searchTimeout = setTimeout(() => {
+    if (!searchTerm.value.trim()) return;
+    focusOnAreaByName(searchTerm.value.trim());
+  }, 2000);
+}
+
+function searchArea() {
+  if (!searchTerm.value.trim()) return;
+  focusOnAreaByName(searchTerm.value.trim());
+}
+
 </script>
 
 <style scoped>
@@ -191,4 +217,29 @@ onBeforeUnmount(() => {
   z-index: 3000;
   white-space: nowrap;
 }
+
+.search-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+}
+
+.search-input {
+  width: 260px;
+  padding: 10px 14px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  outline: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  box-shadow: 0 3px 10px rgba(25, 118, 210, 0.4);
+}
+
 </style>

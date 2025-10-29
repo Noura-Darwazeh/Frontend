@@ -4,86 +4,112 @@ import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import Cluster from 'ol/source/Cluster';
 import OSM from 'ol/source/OSM';
 import { Point, Polygon } from 'ol/geom';
 import Feature from 'ol/Feature';
 import { fromLonLat } from 'ol/proj';
+import { Style, Text, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 import useAreas from './useAreas';
 import { createInteractionManager } from './interactions';
 import { buildPayloadFromFeature, saveFeature } from './payload';
 import { deleteArea as deleteAreaApi } from './map';
-import Cluster from 'ol/source/Cluster';
-import { Style, Text, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 
 export default function useMap({ mapContainer, tooltip, showPopup, areaName, areaDescription }) {
   const { getAreas } = useAreas();
 
   const mapInstance = ref(null);
-  const vectorSource = new VectorSource();
-  const pointClusterInputSource = new VectorSource();
-  const clusterSource = new Cluster({
-    distance: 40,
-    source: pointClusterInputSource,
-  });
-
+  const vectorSource = new VectorSource(); // الأصلية
   const tooltipVisible = ref(false);
   const tooltipText = ref('');
   let interactionManager = null;
 
+  // 🔹 الـ Cluster Source
+  const clusterSource = new Cluster({
+    distance: 40, // المسافة الافتراضية بالبكسل بين النقاط
+    source: vectorSource,
+  });
+
+  // 🔹 الطبقات
+  const raster = new TileLayer({ source: new OSM() });
+
+  // ستايل ديناميكي للكلستر والنقاط
+  const clusterStyle = feature => {
+    const features = feature.get('features');
+    const size = features.length;
+
+    // Cluster (أكثر من نقطة)
+    if (size > 1) {
+      return new Style({
+        image: new CircleStyle({
+          radius: 15,
+          fill: new Fill({ color: 'rgba(0, 123, 255, 0.6)' }),
+          stroke: new Stroke({ color: '#fff', width: 2 }),
+        }),
+        text: new Text({
+          text: size.toString(),
+          fill: new Fill({ color: '#fff' }),
+          font: 'bold 13px sans-serif',
+        }),
+      });
+    }
+
+    // نقطة واحدة
+    return new Style({
+      image: new CircleStyle({
+        radius: 7,
+        fill: new Fill({ color: 'rgba(220, 53, 69, 0.8)' }),
+        stroke: new Stroke({ color: '#fff', width: 2 }),
+      }),
+    });
+  };
+
+  const clusterLayer = new VectorLayer({
+    source: clusterSource,
+    style: clusterStyle,
+  });
+
+  const polygonLayer = new VectorLayer({
+    source: vectorSource, // نستخدم نفس السورس لأن البوليغونات غير مجمعة
+    style: new Style({
+      stroke: new Stroke({ color: '#4CAF50', width: 2 }),
+      fill: new Fill({ color: 'rgba(76, 175, 80, 0.3)' }),
+    }),
+  });
+
+  // 🔹 إنشاء الخريطة
   function createMap() {
-    const raster = new TileLayer({ source: new OSM() });
-    const clusterLayer = new VectorLayer({
-      source: clusterSource,
-      style: (feature) => {
-        const features = feature.get('features') || [];
-        const size = features.length;
-        if (size > 1) {
-          return new Style({
-            image: new CircleStyle({
-              radius: 15,
-              fill: new Fill({ color: 'rgba(0, 123, 255, 0.6)' }),
-              stroke: new Stroke({ color: '#fff', width: 2 }),
-            }),
-            text: new Text({
-              text: String(size),
-              fill: new Fill({ color: '#fff' }),
-            }),
-          });
-        }
-        return new Style({
-          image: new CircleStyle({
-            radius: 7,
-            fill: new Fill({ color: 'rgba(220, 53, 69, 0.8)' }),
-            stroke: new Stroke({ color: '#fff', width: 2 }),
-          }),
-        });
-      },
-    });
-
-    const polygonLayer = new VectorLayer({
-      source: vectorSource,
-      style: (feature) => {
-        const geom = feature.getGeometry?.();
-        if (!geom) return null;
-        const type = geom.getType?.();
-        if (type && type.toLowerCase() === 'polygon') {
-          return new Style({
-            stroke: new Stroke({ color: '#1976d2', width: 2 }),
-            fill: new Fill({ color: 'rgba(25,118,210,0.1)' }),
-            text: new Text({ text: feature.get('name') || '', font: '14px sans-serif', fill: new Fill({ color: '#000' }), offsetY: -10 })
-          });
-        }
-        return null;
-      }
-    });
-
     mapInstance.value = new Map({
       target: mapContainer.value,
-      layers: [raster, clusterLayer, polygonLayer],
+      layers: [raster, polygonLayer, clusterLayer],
       view: new View({ center: [0, 0], zoom: 2 }),
+    });
+
+    // 🔹 تغيير سلوك الكلستر حسب الزوم
+    mapInstance.value.getView().on('change:resolution', () => {
+      const zoom = mapInstance.value.getView().getZoom();
+      const distance = zoom > 14 ? 20 : zoom > 10 ? 40 : 60;
+      clusterSource.setDistance(distance);
+    });
+
+    // 🔹 حدث عند الضغط على الكلستر
+    mapInstance.value.on('click', evt => {
+      mapInstance.value.forEachFeatureAtPixel(evt.pixel, feature => {
+        const features = feature.get('features');
+        if (features && features.length > 1) {
+          // Cluster
+          const names = features.map(f => f.get('name') || '(Unnamed)');
+          alert(`Cluster contains:\n${names.join('\n')}`);
+        } else if (features && features.length === 1) {
+          // نقطة واحدة
+          const f = features[0];
+          alert(`Area: ${f.get('name') || 'Unnamed'}`);
+        }
+      });
     });
   }
 
+  // 🔹 جلب المناطق من الـ API
   async function fetchZones() {
     try {
       const response = await getAreas();
@@ -97,25 +123,16 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
         if (type === 'polygon') {
           const coords = zone.coordinates[0].map(c => fromLonLat(c));
           feature = new Feature(new Polygon([coords]));
-          if (feature) {
-            feature.set('id', zone.id);
-            feature.set('name', zone.name);
-            feature.set('description', zone.description || '');
-            vectorSource.addFeature(feature);
-          }
         } else if (type === 'point') {
           const coord = fromLonLat(zone.coordinates);
-          const editablePoint = new Feature(new Point(coord));
-          editablePoint.set('id', zone.id);
-          editablePoint.set('name', zone.name);
-          editablePoint.set('description', zone.description || '');
-          vectorSource.addFeature(editablePoint);
+          feature = new Feature(new Point(coord));
+        }
 
-          const clusterPoint = new Feature(new Point(coord));
-          clusterPoint.set('id', zone.id);
-          clusterPoint.set('name', zone.name);
-          clusterPoint.set('description', zone.description || '');
-          pointClusterInputSource.addFeature(clusterPoint);
+        if (feature) {
+          feature.set('id', zone.id);
+          feature.set('name', zone.name);
+          feature.set('description', zone.description || '');
+          vectorSource.addFeature(feature);
         }
       });
 
@@ -132,6 +149,7 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
     }
   }
 
+  // 🔹 تهيئة الخريطة مع الانترآكشنز
   function initMap() {
     createMap();
 
@@ -139,23 +157,24 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
       mapInstance,
       mapContainer,
       vectorSource,
-      pointClusterInputSource,
       tooltip,
       showPopup,
       areaName,
       areaDescription,
       saveFeature,
-      deleteAreaApi
+      deleteAreaApi,
     });
 
     interactionManager.initMap();
   }
 
+  // 🔹 الرسم
   function startDrawing(type) {
     if (!interactionManager) return;
     interactionManager.startDrawing(type);
   }
 
+  // 🔹 حفظ منطقة جديدة
   async function saveArea() {
     const f = interactionManager?.getLastDrawnFeature?.();
     if (!f) return alert('No feature to save!');
@@ -164,23 +183,6 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
     f.set('description', areaDescription.value || '');
     try {
       await saveFeature(f, areaName, areaDescription);
-      if (f.getGeometry().getType().toLowerCase() === 'point') {
-        const id = f.getId?.() ?? f.get('id');
-        const existing = pointClusterInputSource.getFeatureById?.(id);
-        const coord = f.getGeometry().getCoordinates();
-        if (existing) {
-          existing.setGeometry(f.getGeometry().clone());
-          existing.set('name', f.get('name'));
-          existing.set('description', f.get('description'));
-        } else {
-          const clone = new Feature(new Point(coord));
-          if (id) clone.setId(id);
-          clone.set('id', id);
-          clone.set('name', f.get('name'));
-          clone.set('description', f.get('description'));
-          pointClusterInputSource.addFeature(clone);
-        }
-      }
       alert('Area saved successfully!');
     } catch (err) {
       console.error(err);
@@ -192,30 +194,26 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
     interactionManager.clearMapInteractions();
   }
 
+  // 🔹 إلغاء منطقة مرسومة
   function cancelArea() {
     const f = interactionManager?.getLastDrawnFeature?.();
-    if (f && !f.get('id')) {
-      const tempId = f.get('id');
-      if (tempId) {
-        const c = pointClusterInputSource.getFeatureById?.(tempId);
-        if (c) pointClusterInputSource.removeFeature(c);
-      }
-      vectorSource.removeFeature(f);
-    }
+    if (f && !f.get('id')) vectorSource.removeFeature(f);
     showPopup.value = false;
     interactionManager.clearMapInteractions();
   }
 
+  // 🔹 حذف الكل
   function clearAllAreas() {
     vectorSource.clear();
-    pointClusterInputSource.clear();
     alert('All areas cleared!');
   }
 
+  // 🔹 أسماء المناطق
   function getAllAreaNames() {
     return vectorSource.getFeatures().map(f => f.get('name')).filter(Boolean);
   }
 
+  // 🔹 البحث بالاسم
   function focusOnAreaByName(name) {
     const features = vectorSource.getFeatures();
     const feature = features.find(f => f.get('name')?.toLowerCase() === name.toLowerCase());
@@ -248,6 +246,6 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
     tooltipVisible,
     tooltipText,
     focusOnAreaByName,
-    getAllAreaNames
+    getAllAreaNames,
   };
 }
