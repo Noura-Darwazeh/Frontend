@@ -1,15 +1,17 @@
 <template>
   <div class="map-page">
-    <div class="search-bar">
-      <input v-model="searchTerm" @input="handleSearch" list="areas-list" placeholder="🔍 Search area..."
-        class="search-input" />
+    <div ref="mapContainer" class="map-container">
 
-      <datalist id="areas-list">
-        <option v-for="name in areaNames" :key="name" :value="name" />
-      </datalist>
+      <div class="search-bar">
+        <input v-model="searchTerm" @input="handleSearch" list="areas-list" placeholder="🔍 Search area..."
+          class="search-input" />
+
+        <datalist id="areas-list">
+          <option v-for="name in areaNames" :key="name" :value="name" />
+        </datalist>
+      </div>
     </div>
 
-    <div ref="mapContainer" class="map-container"></div>
     <div class="floating-button" @click="showDropdown = !showDropdown">
       ➕
       <ul v-if="showDropdown" class="drawing-options">
@@ -63,9 +65,8 @@ const {
 onMounted(async () => {
   initMap();
   await fetchZones();
-  areaNames.value = getAllAreaNames(); 
+  areaNames.value = getAllAreaNames();
 });
-
 
 onBeforeUnmount(() => {
   if (mapInstance.value) mapInstance.value.setTarget(null);
@@ -81,7 +82,6 @@ function handleSearch() {
     focusOnAreaByName(searchTerm.value.trim());
   }, 2000);
 }
-
 function searchArea() {
   if (!searchTerm.value.trim()) return;
   focusOnAreaByName(searchTerm.value.trim());
@@ -89,7 +89,7 @@ function searchArea() {
 
 </script>
 
-<style scoped>
+<style>
 .map-page {
   width: 100%;
   height: 100%;
@@ -106,7 +106,7 @@ function searchArea() {
   right: 20px;
   background-color: #1976d2;
   color: white;
-  font-size: 24px;
+  font-size: 22px;
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -119,10 +119,10 @@ function searchArea() {
 .drawing-options {
   position: absolute;
   bottom: 60px;
-  right: 0;
+  right: 20px;
   background-color: white;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
   list-style: none;
   padding: 5px 0;
   margin: 0;
@@ -131,8 +131,7 @@ function searchArea() {
 .drawing-options li {
   padding: 6px 12px;
   cursor: pointer;
-  background: black;
-  color: white;
+  color: black;
 }
 
 .clear-button {
@@ -220,8 +219,8 @@ function searchArea() {
 
 .search-bar {
   position: absolute;
-  top: 20px;
-  left: 50%;
+  top: 70px;
+  left: 60%;
   transform: translateX(-50%);
   z-index: 2000;
 }
@@ -242,4 +241,22 @@ function searchArea() {
   box-shadow: 0 3px 10px rgba(25, 118, 210, 0.4);
 }
 
+.ol-zoom {
+  padding: 5px;
+  display: flex;
+  gap: 5px;
+}
+
+.ol-zoom button {
+  background-color: #1976d2 !important;
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 </style>

@@ -14,6 +14,7 @@ import { buildPayloadFromFeature, saveFeature } from './payload';
 import { deleteArea as deleteAreaApi } from './map';
 import Cluster from 'ol/source/Cluster';
 import { Style, Text, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
+import { defaults as defaultControls } from 'ol/control';
 
 export default function useMap({ mapContainer, tooltip, showPopup, areaName, areaDescription }) {
   const { getAreas } = useAreas();
@@ -30,8 +31,11 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
   const tooltipText = ref('');
   let interactionManager = null;
 
+  const getFeatureId = (f) => f?.getId?.() ?? f?.get?.('id');
+
   function createMap() {
     const raster = new TileLayer({ source: new OSM() });
+
     const clusterLayer = new VectorLayer({
       source: clusterSource,
       style: (feature) => {
@@ -70,7 +74,12 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
           return new Style({
             stroke: new Stroke({ color: '#1976d2', width: 2 }),
             fill: new Fill({ color: 'rgba(25,118,210,0.1)' }),
-            text: new Text({ text: feature.get('name') || '', font: '14px sans-serif', fill: new Fill({ color: '#000' }), offsetY: -10 })
+            text: new Text({
+              text: feature.get('name') || '',
+              font: '14px sans-serif',
+              fill: new Fill({ color: '#000' }),
+              offsetY: -10
+            })
           });
         }
         return null;
@@ -81,6 +90,83 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
       target: mapContainer.value,
       layers: [raster, clusterLayer, polygonLayer],
       view: new View({ center: [0, 0], zoom: 2 }),
+      controls: defaultControls({
+        zoom: true,
+        rotate: false,
+        attribution: false
+      })
+    });
+
+    mapInstance.value.on('singleclick', (evt) => {
+      const feature = mapInstance.value.forEachFeatureAtPixel(evt.pixel, f => f);
+      if (!feature) return;
+
+      const inner = feature.get('features') || [];
+      if (!Array.isArray(inner) || inner.length <= 1) return;
+      evt.preventDefault();
+      evt.stopPropagation();
+      if (interactionManager) {
+        interactionManager.clearMapInteractions();
+      }
+
+      const menu = document.createElement('div');
+      menu.style.position = 'absolute';
+      menu.style.left = evt.originalEvent.pageX + 'px';
+      menu.style.top = evt.originalEvent.pageY + 'px';
+      menu.style.backgroundColor = '#fff';
+      menu.style.border = '1px solid #ccc';
+      menu.style.padding = '8px';
+      menu.style.zIndex = 10000;
+      menu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+      menu.style.maxHeight = '240px';
+      menu.style.overflowY = 'auto';
+      menu.style.minWidth = '160px';
+      menu.style.fontSize = '13px';
+
+      const title = document.createElement('div');
+      title.innerText = `Areas (${inner.length})`;
+      title.style.fontWeight = '600';
+      title.style.marginBottom = '6px';
+      menu.appendChild(title);
+
+      const list = document.createElement('ul');
+      list.style.listStyle = 'none';
+      list.style.padding = '0';
+      list.style.margin = '0';
+
+      inner.forEach((f, idx) => {
+        const li = document.createElement('li');
+        const originalFeature = f.get('originalFeature') || f;
+        const name = originalFeature.get('name') || `Area ${idx + 1}`;
+        li.innerText = name;
+        li.style.padding = '6px 8px';
+        li.style.cursor = 'pointer';
+        li.style.borderRadius = '4px';
+        li.onmouseenter = () => { li.style.background = '#f1f1f1'; };
+        li.onmouseleave = () => { li.style.background = 'transparent'; };
+        li.onclick = (e) => {
+          e.stopPropagation();
+          const geom = originalFeature.getGeometry();
+          if (geom) {
+            const view = mapInstance.value.getView();
+            if (geom.getType().toLowerCase() === 'point') {
+              view.animate({ center: geom.getCoordinates(), duration: 500, zoom: 16 });
+            } else {
+              view.fit(geom.getExtent(), { duration: 500, maxZoom: 18 });
+            }
+          }
+          menu.remove();
+        };
+        list.appendChild(li);
+      });
+      menu.appendChild(list);
+      document.body.appendChild(menu);
+
+      const removeMenu = () => {
+        if (menu && menu.parentNode) menu.parentNode.removeChild(menu);
+        document.removeEventListener('click', removeMenu);
+      };
+      setTimeout(() => document.addEventListener('click', removeMenu), 0);
     });
   }
 
@@ -97,24 +183,44 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
         if (type === 'polygon') {
           const coords = zone.coordinates[0].map(c => fromLonLat(c));
           feature = new Feature(new Polygon([coords]));
-          if (feature) {
-            feature.set('id', zone.id);
-            feature.set('name', zone.name);
-            feature.set('description', zone.description || '');
-            vectorSource.addFeature(feature);
+          feature.setId(zone.id);
+          feature.set('id', zone.id);
+          feature.set('name', zone.name);
+          feature.set('description', zone.description || '');
+          vectorSource.addFeature(feature);
+
+          // اضافة نقطة داخلية للكلستر
+          let interiorCoords = feature.getGeometry().getInteriorPoint?.()?.getCoordinates();
+          if (!interiorCoords) {
+            const ex = feature.getGeometry().getExtent();
+            interiorCoords = [(ex[0]+ex[2])/2, (ex[1]+ex[3])/2];
           }
+          const clusterPoint = new Feature(new Point(interiorCoords));
+          clusterPoint.setId(`poly-${zone.id}`);
+          clusterPoint.set('originId', zone.id);
+          clusterPoint.set('originType', 'polygon');
+          clusterPoint.set('originalFeature', feature);
+          clusterPoint.set('name', zone.name);
+          clusterPoint.set('description', zone.description || '');
+          pointClusterInputSource.addFeature(clusterPoint);
+
         } else if (type === 'point') {
           const coord = fromLonLat(zone.coordinates);
           const editablePoint = new Feature(new Point(coord));
+          editablePoint.setId(zone.id);
           editablePoint.set('id', zone.id);
           editablePoint.set('name', zone.name);
           editablePoint.set('description', zone.description || '');
           vectorSource.addFeature(editablePoint);
 
           const clusterPoint = new Feature(new Point(coord));
+          clusterPoint.setId(zone.id);
           clusterPoint.set('id', zone.id);
           clusterPoint.set('name', zone.name);
           clusterPoint.set('description', zone.description || '');
+          clusterPoint.set('originalFeature', editablePoint);
+          clusterPoint.set('originId', zone.id);
+          clusterPoint.set('originType', 'point');
           pointClusterInputSource.addFeature(clusterPoint);
         }
       });
@@ -164,23 +270,49 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
     f.set('description', areaDescription.value || '');
     try {
       await saveFeature(f, areaName, areaDescription);
-      if (f.getGeometry().getType().toLowerCase() === 'point') {
+
+      const geomType = f.getGeometry().getType().toLowerCase();
+      if (geomType === 'point') {
         const id = f.getId?.() ?? f.get('id');
         const existing = pointClusterInputSource.getFeatureById?.(id);
-        const coord = f.getGeometry().getCoordinates();
         if (existing) {
           existing.setGeometry(f.getGeometry().clone());
           existing.set('name', f.get('name'));
           existing.set('description', f.get('description'));
         } else {
-          const clone = new Feature(new Point(coord));
-          if (id) clone.setId(id);
+          const clone = new Feature(new Point(f.getGeometry().getCoordinates()));
+          clone.setId(id);
           clone.set('id', id);
           clone.set('name', f.get('name'));
           clone.set('description', f.get('description'));
+          clone.set('originalFeature', f);
           pointClusterInputSource.addFeature(clone);
         }
+      } else if (geomType === 'polygon') {
+        let interiorCoords = f.getGeometry().getInteriorPoint?.()?.getCoordinates();
+        if (!interiorCoords) {
+          const ex = f.getGeometry().getExtent();
+          interiorCoords = [(ex[0]+ex[2])/2, (ex[1]+ex[3])/2];
+        }
+        const polyId = `poly-${f.getId?.() ?? f.get('id')}`;
+        const existing = pointClusterInputSource.getFeatureById?.(polyId);
+        if (existing) {
+          existing.setGeometry(new Point(interiorCoords));
+          existing.set('originalFeature', f);
+          existing.set('originId', f.getId?.() ?? f.get('id'));
+          existing.set('originType', 'polygon');
+        } else {
+          const cp = new Feature(new Point(interiorCoords));
+          cp.setId(polyId);
+          cp.set('originalFeature', f);
+          cp.set('originId', f.getId?.() ?? f.get('id'));
+          cp.set('originType', 'polygon');
+          cp.set('name', f.get('name'));
+          cp.set('description', f.get('description'));
+          pointClusterInputSource.addFeature(cp);
+        }
       }
+
       alert('Area saved successfully!');
     } catch (err) {
       console.error(err);
@@ -219,22 +351,14 @@ export default function useMap({ mapContainer, tooltip, showPopup, areaName, are
   function focusOnAreaByName(name) {
     const features = vectorSource.getFeatures();
     const feature = features.find(f => f.get('name')?.toLowerCase() === name.toLowerCase());
-
     if (!feature) {
       alert('Area not found!');
       return;
     }
-
     const geom = feature.getGeometry();
     if (!geom || !mapInstance.value) return;
-
     const view = mapInstance.value.getView();
-    const extent = geom.getExtent();
-
-    view.fit(extent, {
-      duration: 1000,
-      maxZoom: 20,
-    });
+    view.fit(geom.getExtent(), { duration: 1000, maxZoom: 20 });
   }
 
   return {
