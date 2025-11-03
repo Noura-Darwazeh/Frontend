@@ -1,3 +1,4 @@
+// payload.js
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Style, Fill, Stroke, Text } from 'ol/style';
 import { updateArea, postArea } from './map';

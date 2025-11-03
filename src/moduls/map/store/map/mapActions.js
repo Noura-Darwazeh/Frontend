@@ -1,3 +1,4 @@
+//mapAcion.js
 import { Point } from 'ol/geom';
 import Feature from 'ol/Feature';
 import { saveFeature } from '../payload';

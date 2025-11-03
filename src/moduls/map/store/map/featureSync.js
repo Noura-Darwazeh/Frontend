@@ -1,3 +1,4 @@
+//featureSync.js
 import { removeFromCluster, updateClusterFeature } from './clusterManager';
 
 // vectorSource /clusterSource

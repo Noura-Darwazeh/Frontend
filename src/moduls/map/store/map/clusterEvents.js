@@ -1,3 +1,4 @@
+//clusterEvent.js
 // create menue when click on cluster
 export function setupClusterClickHandler(mapInstance, getInteractionManager) {
   mapInstance.value.on('singleclick', (evt) => {
