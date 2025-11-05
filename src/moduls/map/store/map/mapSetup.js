@@ -1,3 +1,4 @@
+// src/moduls/map/store/map/mapSetup.js
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -54,27 +55,36 @@ export function createPolygonLayer(vectorSource) {
     renderMode: 'image',
     updateWhileAnimating: false,
     updateWhileInteracting: false,
-    declutter: true,
+    declutter: true, // ✅ هاد بساعد كمان يمنع الليبلز تتداخل
     style: (feature) => {
       const geom = feature.getGeometry?.();
       if (!geom) return null;
 
       const type = geom.getType?.();
       if (type && type.toLowerCase() === 'polygon') {
-        const view = feature.get('__inView');
+        const name = feature.get('name') || '';
+        
+        // ✅ شرط جديد: اظهر الليبل بس لما البوليجون يكون visible ومش مخبي
+        const showLabel = feature.get('showLabel') !== false;
 
         return new Style({
           stroke: new Stroke({
             color: '#1976d2',
-            width: view ? 2 : 1
+            width: 2
           }),
           fill: new Fill({
-            color: view ? 'rgba(25,118,210,0.1)' : 'rgba(25,118,210,0.05)'
+            color: 'rgba(25,118,210,0.1)'
           }),
-          text: view ? new Text({
-            text: feature.get('name') || '',
-            font: '12px sans-serif',
+          text: (name && showLabel) ? new Text({
+            text: name,
+            font: 'bold 13px sans-serif',
             fill: new Fill({ color: '#000' }),
+            backgroundFill: new Fill({ color: '#fff' }),
+            backgroundStroke: new Stroke({ 
+              color: '#ccc', 
+              width: 1 
+            }),
+            padding: [3, 5, 3, 5],
             offsetY: -10,
             overflow: true,
           }) : undefined,
