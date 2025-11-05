@@ -26,7 +26,7 @@ api.interceptors.request.use((config) => {
 // Get areas
 export const getAreas = async () => {
   try {
-    const response = await api.get('/zones?page=1&paginate=6000')
+    const response = await api.get('/zones?page=1&paginate=100')
     return response.data;
   } catch (error) {
     console.error('Error fetching areas:', error);

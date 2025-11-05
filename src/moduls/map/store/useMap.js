@@ -43,6 +43,7 @@ export default function useMap({
     distance: 50,
     minDistance: 20,
     source: pointClusterInputSource,
+
   });
 
   const tooltipVisible = ref(false);

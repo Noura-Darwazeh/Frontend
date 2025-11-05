@@ -32,6 +32,11 @@ export function createClusterLayer(clusterSource) {
         });
       }
 
+      const singleFeature = features[0];
+      if (singleFeature.get('originType') === 'polygon') {
+        return null;
+      }
+
       return new Style({
         image: new CircleStyle({
           radius: 6,
@@ -79,7 +84,6 @@ export function createPolygonLayer(vectorSource) {
     },
   });
 }
-
 
 export function createMapInstance(mapContainer, clusterLayer, polygonLayer) {
   const raster = new TileLayer({
