@@ -68,7 +68,6 @@ class SpatialIndex {
   }
 }
 
-
 // Handles visible features and updates on map move
 export class ViewportRenderer {
   constructor(mapInstance, vectorSource) {

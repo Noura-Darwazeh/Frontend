@@ -1,4 +1,3 @@
-//interactions.js - FIXED VERSION WITH CLUSTER HANDLING
 import Draw, { createBox } from 'ol/interaction/Draw';
 import Modify from 'ol/interaction/Modify';
 import Translate from 'ol/interaction/Translate';
@@ -8,44 +7,31 @@ import Feature from 'ol/Feature';
 import { fromLonLat } from 'ol/proj';
 import { Style, Fill, Stroke, Text, Circle as CircleStyle } from 'ol/style';
 
-/**
- * 🔧 دالة مساعدة: يجيب الـ ID من أي feature (عادي أو cluster)
- */
 function extractFeatureId(feature) {
-    // محاولة 1: مباشرة من الـ feature
     let id = feature.get('id') || feature.getId();
     if (id && id !== 'undefined' && !String(id).startsWith('poly-')) {
-        // تنظيف الـ ID إذا كان poly-XXX نرجع XXX
         if (String(id).startsWith('poly-')) {
             return String(id).replace('poly-', '');
         }
         return id;
     }
-    
-    // محاولة 2: من originalFeature
+
     const originalFeature = feature.get('originalFeature');
     if (originalFeature) {
         id = originalFeature.get('id') || originalFeature.getId();
         if (id && id !== 'undefined') return id;
     }
-    
-    // محاولة 3: من originId (للبوليجونات في الكلاستر)
+
     id = feature.get('originId');
     if (id && id !== 'undefined') return id;
-    
+
     return null;
 }
 
-/**
- * 🔧 دالة مساعدة: يجيب الـ feature الأصلي (سواء عادي أو من cluster)
- */
 function extractOriginalFeature(feature) {
     return feature.get('originalFeature') || feature;
 }
 
-/**
- * 🔧 دالة مساعدة: يتحقق إذا الـ feature هو cluster
- */
 function isClusterFeature(feature) {
     const features = feature.get('features');
     return Array.isArray(features) && features.length > 0;
@@ -92,21 +78,17 @@ export function createInteractionManager({
         mapInstance.value.on('singleclick', evt => {
             const clickedFeature = mapInstance.value.forEachFeatureAtPixel(evt.pixel, f => f);
             if (!clickedFeature) return;
-            
-            // 🔧 تحقق إذا هو cluster
+
             if (isClusterFeature(clickedFeature)) {
                 const clusterFeatures = clickedFeature.get('features');
-                
-                // إذا في feature واحد بس، نتعامل معاه
+
                 if (clusterFeatures.length === 1) {
                     const feature = clusterFeatures[0];
                     showContextMenu(feature, evt);
                 }
-                // إذا في أكثر من feature، clusterEvents.js راح يتعامل معاه
                 return;
             }
-            
-            // إذا مش cluster، نتعامل معاه عادي
+
             showContextMenu(clickedFeature, evt);
         });
     }
@@ -155,16 +137,15 @@ export function createInteractionManager({
         };
         setTimeout(() => document.addEventListener('click', removeMenu), 0);
 
-        // ✅ Edit - مُعدَّل
         editBtn.onclick = (e) => {
             e.stopPropagation();
-            
+
             const originalFeature = extractOriginalFeature(feature);
-            
-            console.log('📝 Edit clicked for feature:', originalFeature);
-            console.log('📝 Feature ID:', extractFeatureId(feature));
-            console.log('📝 Feature name:', originalFeature.get('name'));
-            
+
+            console.log('Edit clicked for feature:', originalFeature);
+            console.log('Feature ID:', extractFeatureId(feature));
+            console.log('Feature name:', originalFeature.get('name'));
+
             areaName.value = originalFeature.get('name') || '';
             areaDescription.value = originalFeature.get('description') || '';
             showPopup.value = true;
@@ -179,15 +160,14 @@ export function createInteractionManager({
             removeMenu();
         };
 
-        // ✅ Edit Shape - مُعدَّل
         editShapeBtn.onclick = (e) => {
             e.stopPropagation();
             clearMapInteractions();
 
             const originalFeature = extractOriginalFeature(feature);
 
-            console.log('✏️ Edit Shape clicked for feature:', originalFeature);
-            console.log('✏️ Feature ID:', extractFeatureId(feature));
+            console.log('Edit Shape clicked for feature:', originalFeature);
+            console.log('Feature ID:', extractFeatureId(feature));
 
             selectInteraction = new Select();
             selectInteraction.getFeatures().clear();
@@ -203,15 +183,14 @@ export function createInteractionManager({
             removeMenu();
         };
 
-        // ✅ Move - مُعدَّل
         moveBtn.onclick = (e) => {
             e.stopPropagation();
             clearMapInteractions();
 
             const originalFeature = extractOriginalFeature(feature);
 
-            console.log('🚚 Move clicked for feature:', originalFeature);
-            console.log('🚚 Feature ID:', extractFeatureId(feature));
+            console.log(' Move clicked for feature:', originalFeature);
+            console.log('Feature ID:', extractFeatureId(feature));
 
             selectInteraction = new Select();
             selectInteraction.getFeatures().clear();
@@ -231,48 +210,45 @@ export function createInteractionManager({
             removeMenu();
         };
 
-        // ✅ Delete - مُعدَّل ومُصلَح
+
         deleteBtn.onclick = async (e) => {
             e.stopPropagation();
             removeMenu();
-            
-            // 🔧 استخراج البيانات
+
             const id = extractFeatureId(feature);
             const originalFeature = extractOriginalFeature(feature);
-            
-            // 🐛 Debug logging
-            console.log('🗑️ Delete clicked');
-            console.log('🗑️ Clicked feature:', feature);
-            console.log('🗑️ Original feature:', originalFeature);
-            console.log('🗑️ Extracted ID:', id);
-            console.log('🗑️ Feature.get("id"):', feature.get('id'));
-            console.log('🗑️ Feature.getId():', feature.getId());
-            console.log('🗑️ Original.get("id"):', originalFeature?.get('id'));
-            console.log('🗑️ Original.getId():', originalFeature?.getId());
-            
+
+            //  Debug logging
+            console.log('Delete clicked');
+            console.log('Clicked feature:', feature);
+            console.log('Original feature:', originalFeature);
+            console.log('Extracted ID:', id);
+            console.log('Feature.get("id"):', feature.get('id'));
+            console.log('Feature.getId():', feature.getId());
+            console.log('Original.get("id"):', originalFeature?.get('id'));
+            console.log(' Original.getId():', originalFeature?.getId());
+
             const confirmDelete = window.confirm(`Are you sure you want to delete "${originalFeature.get('name') || 'this area'}"?`);
             if (!confirmDelete) return;
-            
+
             if (id) {
                 try {
                     console.log('🔄 Attempting to delete ID:', id);
-                    // حذف من الداتابيس
                     await deleteAreaApi(id);
-                    
-                    console.log('✅ Deleted from database, removing from map...');
-                    // حذف من الخريطة
+
+                    console.log('Deleted from database, removing from map...');
                     vectorSource.removeFeature(originalFeature);
-                    
-                    alert('✅ Area deleted successfully!');
+
+                    alert('Area deleted successfully!');
                 } catch (err) {
-                    console.error('❌ Error deleting area:', err);
-                    alert('❌ Error deleting area: ' + (err.response?.data?.message || err.message || 'Unknown error'));
+                    console.error(' Error deleting area:', err);
+                    alert(' Error deleting area: ' + (err.response?.data?.message || err.message || 'Unknown error'));
                 }
             } else {
-                console.warn('⚠️ No ID found - removing from map only');
-                console.warn('⚠️ This usually means the feature was not saved to database');
+                console.warn(' No ID found - removing from map only');
+                console.warn(' This usually means the feature was not saved to database');
                 vectorSource.removeFeature(originalFeature);
-                alert('⚠️ Area removed from map (no database ID found - might be a new unsaved area)');
+                alert(' Area removed from map (no database ID found - might be a new unsaved area)');
             }
         };
     }

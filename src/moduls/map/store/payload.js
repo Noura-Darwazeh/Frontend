@@ -49,8 +49,6 @@ export function buildPayloadFromFeature(feature, areaNameRef, areaDescriptionRef
     };
 }
 
-// src/moduls/map/store/payload.js
-
 export async function saveFeature(feature, areaNameRef, areaDescriptionRef) {
     try {
         if (!feature) return null;
@@ -66,27 +64,27 @@ export async function saveFeature(feature, areaNameRef, areaDescriptionRef) {
             else if (res && res.id) feature.set('id', res.id);
         }
 
-        // ✅ تحديث الستايل مع اسم المنطقة
+
         const name = feature.get('name') || '';
         feature.setStyle(new Style({
-            stroke: new Stroke({ 
-              color: '#1976d2', 
-              width: 2 
+            stroke: new Stroke({
+                color: '#1976d2',
+                width: 2
             }),
-            fill: new Fill({ 
-              color: 'rgba(25,118,210,0.1)' 
+            fill: new Fill({
+                color: 'rgba(25,118,210,0.1)'
             }),
-            text: name ? new Text({ 
-                text: name, 
-                font: 'bold 13px sans-serif', 
-                fill: new Fill({ color: '#000' }), // ✅ خط أسود
-                backgroundFill: new Fill({ color: '#fff' }), // ✅ خلفية بيضاء
-                backgroundStroke: new Stroke({ 
-                  color: '#ccc', 
-                  width: 1 
-                }), // ✅ حدود
-                padding: [3, 5, 3, 5], // ✅ مسافة داخلية
-                offsetY: -10 
+            text: name ? new Text({
+                text: name,
+                font: 'bold 13px sans-serif',
+                fill: new Fill({ color: '#000' }),
+                backgroundFill: new Fill({ color: '#fff' }),
+                backgroundStroke: new Stroke({
+                    color: '#ccc',
+                    width: 1
+                }),
+                padding: [3, 5, 3, 5],
+                offsetY: -10
             }) : undefined
         }));
 
