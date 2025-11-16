@@ -12,8 +12,36 @@
       </div>
     </div>
 
+    <!-- Top Right Action Buttons (Horizontal) -->
+    <div class="action-buttons">
+      <!-- Edit Button -->
+      <div class="action-button edit-btn" :class="{ active: showEditDropdown }"
+        @click="showEditDropdown = !showEditDropdown">
+        <img :src="editIcon" alt="Edit Icon" class="icon" width="25" height="25" />
+
+        <ul v-if="showEditDropdown" class="action-dropdown">
+          <li @click.stop="startEditMode('shape')">Edit Shape</li>
+          <li @click.stop="startEditMode('info')">Edit Info</li>
+        </ul>
+      </div>
+
+      <!-- Move Button -->
+      <div class="action-button move-btn" :class="{ active: editMode === 'move' }" @click="startEditMode('move')"
+        title="Move Feature">
+        <img :src="moveIcon" alt="Move Icon" class="icon" width="25" height="25" />
+      </div>
+
+      <!-- Delete Button -->
+      <div class="action-button delete-btn" :class="{ active: editMode === 'delete' }" @click="startEditMode('delete')"
+        title="Delete Feature">
+        <img :src="deleteIcon" alt="Delete Icon" class="icon" width="25" height="25" />
+
+      </div>
+    </div>
+
+    <!-- Add Button (Bottom Right) -->
     <div class="floating-button" @click="showDropdown = !showDropdown">
-      ➕
+      <img :src="addIcon" alt="Add Icon" class="icon" width="25" height="25" />
       <ul v-if="showDropdown" class="drawing-options">
         <li v-for="shape in shapes" :key="shape" @click="startDrawing(shape)">
           {{ shape }}
@@ -22,11 +50,21 @@
     </div>
 
     <div class="clear-button" @click="clearAllAreas">🗑️ Clear All</div>
+
     <MapPopup v-if="showPopup" v-model:areaName="areaName" v-model:areaDescription="areaDescription" @save="saveArea"
       @cancel="cancelArea" />
 
     <div ref="tooltip" class="map-tooltip" v-show="tooltipVisible">
       {{ tooltipText }}
+    </div>
+
+    <!-- Edit Mode Message -->
+    <div v-if="editMode && editMode !== 'none'" class="edit-mode-message">
+      <span v-if="editMode === 'shape'">Click on a feature to edit its shape</span>
+      <span v-else-if="editMode === 'info'">Click on a feature to edit its info</span>
+      <span v-else-if="editMode === 'move'">Click on a feature to move it</span>
+      <span v-else-if="editMode === 'delete'">Click on a feature to delete it</span>
+      <button @click="cancelEditMode">Cancel</button>
     </div>
   </div>
 </template>
@@ -35,17 +73,22 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import MapPopup from '../components/MapPopup.vue';
 import useMap from '../store/useMap';
+import moveIcon from '../../../assets/map/move.svg';
+import editIcon from '../../../assets/map/edit.svg';
+import deleteIcon from '../../../assets/map/delete.svg';
+import addIcon from '../../../assets/map/add.svg';
 
 const mapContainer = ref(null);
 const tooltip = ref(null);
 const showDropdown = ref(false);
+const showEditDropdown = ref(false);
 const showPopup = ref(false);
 const areaName = ref('');
 const areaDescription = ref('');
 const searchTerm = ref('');
-//search
 const areaNames = ref([]);
 const shapes = ['Point', 'Polygon', 'Box', 'Square', 'Circle'];
+const editMode = ref(null);
 
 const {
   initMap,
@@ -58,8 +101,9 @@ const {
   tooltipVisible,
   tooltipText,
   focusOnAreaByName,
-  //search
   getAllAreaNames,
+  enableEditMode,
+  disableEditMode,
 } = useMap({ mapContainer, tooltip, showPopup, areaName, areaDescription });
 
 onMounted(async () => {
@@ -82,9 +126,35 @@ function handleSearch() {
     focusOnAreaByName(searchTerm.value.trim());
   }, 2000);
 }
-function searchArea() {
-  if (!searchTerm.value.trim()) return;
-  focusOnAreaByName(searchTerm.value.trim());
+
+function startEditMode(mode) {
+  if (editMode.value === mode) {
+    cancelEditMode();
+    return;
+  }
+
+  editMode.value = mode;
+  showEditDropdown.value = false;
+
+  if (enableEditMode) {
+    enableEditMode(mode, (feature) => {
+      editMode.value = null;
+
+      if (mode === 'info') {
+        areaName.value = feature.get('name') || '';
+        areaDescription.value = feature.get('description') || '';
+        showPopup.value = true;
+      }
+    });
+  }
+}
+
+function cancelEditMode() {
+  editMode.value = null;
+  showEditDropdown.value = false;
+  if (disableEditMode) {
+    disableEditMode();
+  }
 }
 
 </script>
@@ -100,38 +170,110 @@ function searchArea() {
   height: 100vh;
 }
 
-.floating-button {
+.action-buttons {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background-color: #1976d2;
-  color: white;
-  font-size: 22px;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  line-height: 50px;
-  cursor: pointer;
+  top: 70px;
+  right: 30px;
+  display: flex;
+  gap: 10px;
   z-index: 1000;
 }
 
-.drawing-options {
+.action-button {
+  background-color: white;
+  color: #333;
+  font-size: 10px;
+  border-radius: 8px;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Edit Dropdown */
+.action-dropdown {
   position: absolute;
-  bottom: 60px;
-  right: 20px;
+  top: 60px;
+  right: 0;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 8px;
   list-style: none;
   padding: 5px 0;
   margin: 0;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-dropdown li {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: #333;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+}
+
+.action-dropdown li:hover {
+  background-color: #f1f1f1;
+}
+
+/* Add Button (Bottom Right) */
+.floating-button {
+  border-radius: 8px;
+  position: absolute;
+  top: 70px;
+  right: 170px;
+  background-color: white;
+  color: white;
+  width: 35px;
+  height: 35px;
+  text-align: center;
+  line-height: 30px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.floating-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.drawing-options {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .drawing-options li {
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   color: black;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.drawing-options li:hover {
+  background-color: #f1f1f1;
 }
 
 .clear-button {
@@ -241,21 +383,69 @@ function searchArea() {
   box-shadow: 0 3px 10px rgba(25, 118, 210, 0.4);
 }
 
-.ol-zoom {
-  padding: 5px;
+/* Edit Mode Message */
+.edit-mode-message {
+  position: absolute;
+  top: 85px;
+  right: 20px;
+  background-color: white;
+  color: black;
+  padding: 12px 16px;
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.edit-mode-message button {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.edit-mode-message button:hover {
+  background-color: #f1f1f1;
+}
+
+.ol-zoom {
+  position: absolute;
+  bottom: 90px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
   gap: 5px;
+  z-index: 1000;
 }
 
 .ol-zoom button {
-  background-color: #1976d2 !important;
-  color: white;
+  background-color: white !important;
+  color: rgb(160, 155, 155);
   border: none;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
-  width: 30px;
-  height: 30px;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }

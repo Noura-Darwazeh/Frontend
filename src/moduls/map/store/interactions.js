@@ -74,23 +74,6 @@ export function createInteractionManager({
                 }
             }
         });
-
-        mapInstance.value.on('singleclick', evt => {
-            const clickedFeature = mapInstance.value.forEachFeatureAtPixel(evt.pixel, f => f);
-            if (!clickedFeature) return;
-
-            if (isClusterFeature(clickedFeature)) {
-                const clusterFeatures = clickedFeature.get('features');
-
-                if (clusterFeatures.length === 1) {
-                    const feature = clusterFeatures[0];
-                    showContextMenu(feature, evt);
-                }
-                return;
-            }
-
-            showContextMenu(clickedFeature, evt);
-        });
     }
 
     function showContextMenu(feature, evt) {
@@ -106,16 +89,6 @@ export function createInteractionManager({
         menu.style.zIndex = 10000;
         menu.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
 
-        const editBtn = document.createElement('button');
-        editBtn.innerText = 'Edit';
-        editBtn.style.display = 'block';
-        editBtn.style.marginBottom = '5px';
-
-        const editShapeBtn = document.createElement('button');
-        editShapeBtn.innerText = 'Edit Shape';
-        editShapeBtn.style.display = 'block';
-        editShapeBtn.style.marginBottom = '5px';
-
         const moveBtn = document.createElement('button');
         moveBtn.innerText = 'Move';
         moveBtn.style.display = 'block';
@@ -125,8 +98,6 @@ export function createInteractionManager({
         deleteBtn.innerText = 'Delete';
         deleteBtn.style.display = 'block';
 
-        menu.appendChild(editBtn);
-        menu.appendChild(editShapeBtn);
         menu.appendChild(moveBtn);
         menu.appendChild(deleteBtn);
         document.body.appendChild(menu);
@@ -137,59 +108,13 @@ export function createInteractionManager({
         };
         setTimeout(() => document.addEventListener('click', removeMenu), 0);
 
-        editBtn.onclick = (e) => {
-            e.stopPropagation();
-
-            const originalFeature = extractOriginalFeature(feature);
-
-            console.log('Edit clicked for feature:', originalFeature);
-            console.log('Feature ID:', extractFeatureId(feature));
-            console.log('Feature name:', originalFeature.get('name'));
-
-            areaName.value = originalFeature.get('name') || '';
-            areaDescription.value = originalFeature.get('description') || '';
-            showPopup.value = true;
-
-            clearMapInteractions();
-            modifyInteraction = new Modify({ source: vectorSource });
-            modifyInteraction.on('modifyend', async (me) => {
-                try { me.features.getArray().forEach(f => saveFeature(f, areaName, areaDescription)); }
-                catch (err) { console.error('Modify save error:', err); }
-            });
-            mapInstance.value.addInteraction(modifyInteraction);
-            removeMenu();
-        };
-
-        editShapeBtn.onclick = (e) => {
-            e.stopPropagation();
-            clearMapInteractions();
-
-            const originalFeature = extractOriginalFeature(feature);
-
-            console.log('Edit Shape clicked for feature:', originalFeature);
-            console.log('Feature ID:', extractFeatureId(feature));
-
-            selectInteraction = new Select();
-            selectInteraction.getFeatures().clear();
-            selectInteraction.getFeatures().push(originalFeature);
-            mapInstance.value.addInteraction(selectInteraction);
-
-            modifyInteraction = new Modify({ features: selectInteraction.getFeatures() });
-            modifyInteraction.on('modifyend', async (me) => {
-                try { me.features.getArray().forEach(f => saveFeature(f, areaName, areaDescription)); }
-                catch (err) { console.error('EditShape modify save error:', err); }
-            });
-            mapInstance.value.addInteraction(modifyInteraction);
-            removeMenu();
-        };
-
         moveBtn.onclick = (e) => {
             e.stopPropagation();
             clearMapInteractions();
 
             const originalFeature = extractOriginalFeature(feature);
 
-            console.log(' Move clicked for feature:', originalFeature);
+            console.log('Move clicked for feature:', originalFeature);
             console.log('Feature ID:', extractFeatureId(feature));
 
             selectInteraction = new Select();
@@ -210,7 +135,6 @@ export function createInteractionManager({
             removeMenu();
         };
 
-
         deleteBtn.onclick = async (e) => {
             e.stopPropagation();
             removeMenu();
@@ -218,22 +142,17 @@ export function createInteractionManager({
             const id = extractFeatureId(feature);
             const originalFeature = extractOriginalFeature(feature);
 
-            //  Debug logging
             console.log('Delete clicked');
             console.log('Clicked feature:', feature);
             console.log('Original feature:', originalFeature);
             console.log('Extracted ID:', id);
-            console.log('Feature.get("id"):', feature.get('id'));
-            console.log('Feature.getId():', feature.getId());
-            console.log('Original.get("id"):', originalFeature?.get('id'));
-            console.log(' Original.getId():', originalFeature?.getId());
 
             const confirmDelete = window.confirm(`Are you sure you want to delete "${originalFeature.get('name') || 'this area'}"?`);
             if (!confirmDelete) return;
 
             if (id) {
                 try {
-                    console.log('🔄 Attempting to delete ID:', id);
+                    console.log('Attempting to delete ID:', id);
                     await deleteAreaApi(id);
 
                     console.log('Deleted from database, removing from map...');
@@ -241,14 +160,13 @@ export function createInteractionManager({
 
                     alert('Area deleted successfully!');
                 } catch (err) {
-                    console.error(' Error deleting area:', err);
-                    alert(' Error deleting area: ' + (err.response?.data?.message || err.message || 'Unknown error'));
+                    console.error('Error deleting area:', err);
+                    alert('Error deleting area: ' + (err.response?.data?.message || err.message || 'Unknown error'));
                 }
             } else {
-                console.warn(' No ID found - removing from map only');
-                console.warn(' This usually means the feature was not saved to database');
+                console.warn('No ID found - removing from map only');
                 vectorSource.removeFeature(originalFeature);
-                alert(' Area removed from map (no database ID found - might be a new unsaved area)');
+                alert('Area removed from map (no database ID found)');
             }
         };
     }
@@ -275,10 +193,64 @@ export function createInteractionManager({
         });
     }
 
+    // New function to start editing shape
+    function startEditShape(feature) {
+        clearMapInteractions();
+
+        console.log('Starting edit shape for feature:', feature);
+
+        selectInteraction = new Select();
+        selectInteraction.getFeatures().clear();
+        selectInteraction.getFeatures().push(feature);
+        mapInstance.value.addInteraction(selectInteraction);
+
+        modifyInteraction = new Modify({ features: selectInteraction.getFeatures() });
+        modifyInteraction.on('modifyend', async (me) => {
+            try {
+                me.features.getArray().forEach(f => saveFeature(f, areaName, areaDescription));
+                alert('Shape updated successfully!');
+            } catch (err) {
+                console.error('Edit shape save error:', err);
+                alert('Error saving shape changes');
+            } finally {
+                clearMapInteractions();
+            }
+        });
+        mapInstance.value.addInteraction(modifyInteraction);
+    }
+
+    // New function to start moving feature
+    function startMove(feature, areaNameRef, areaDescriptionRef) {
+        clearMapInteractions();
+
+        console.log('Starting move for feature:', feature);
+
+        selectInteraction = new Select();
+        selectInteraction.getFeatures().clear();
+        selectInteraction.getFeatures().push(feature);
+        mapInstance.value.addInteraction(selectInteraction);
+
+        translateInteraction = new Translate({ features: selectInteraction.getFeatures() });
+        translateInteraction.on('translateend', async (te) => {
+            try {
+                te.features.getArray().forEach(f => saveFeature(f, areaNameRef, areaDescriptionRef));
+                alert('Feature moved successfully!');
+            } catch (err) {
+                console.error('Move save error:', err);
+                alert('Error saving move changes');
+            } finally {
+                clearMapInteractions();
+            }
+        });
+        mapInstance.value.addInteraction(translateInteraction);
+    }
+
     return {
         initMap,
         startDrawing,
         clearMapInteractions,
-        getLastDrawnFeature: () => lastDrawnFeature
+        getLastDrawnFeature: () => lastDrawnFeature,
+        startEditShape,
+        startMove
     };
 }
